@@ -103,12 +103,66 @@ module Events =
                 dna = (fst newDNA) @ (snd (split len (snd newDNA))) }
         result :: (filter l (fun x -> x <> target))       
     
+    let duplicate l s g1 g2 =
+        let target = target l s g2
+        let result = 
+            { speciesId = target.speciesId; 
+                geneId = g1; 
+                dna = target.dna }
+        result :: l
+        
+    let loss l s g =
+        let target = target l s g
+        filter l (fun x -> x <> target)
+        
+    let fission l s g1 g2 i =
+        let target = target l s g2
+        let newDNA = split i target.dna
+        let result1 = 
+            { speciesId = target.speciesId; 
+                geneId = target.geneId; 
+                dna = (fst newDNA) }
+        let result2 = 
+            { speciesId = target.speciesId; 
+                geneId = g1; 
+                dna = (snd newDNA) }
+        [result1; result2] @ (filter l (fun x -> x <> target))
+        
+    let fusion l s g1 g2 =
+        let target1 = target l s g1
+        let target2 = target l s g2
+        let result = 
+            { speciesId = target1.speciesId; 
+                geneId = target1.geneId; 
+                dna = target1.dna @ target2.dna }
+        result :: (filter l (fun x -> x <> target1 && x <> target2))
+    
+    let speciation l s1 s2 =
+        let target = l |> List.filter (fun x -> x.speciesId = s2)
+        let rec newSpecies l s =
+            match l with
+            | [] -> []
+            | [head] -> 
+                { speciesId = s; 
+                geneId = head.geneId; 
+                dna = head.dna } :: []
+            | head::tail ->
+                { speciesId = s; 
+                geneId = head.geneId; 
+                dna = head.dna } :: newSpecies tail s
+        (newSpecies target s1) @ l
+                         
     let events l (e:string list) =
         match e.[0] with
         | "create" -> create l (toInt e.[1]) (toInt e.[2]) e.[3]
         | "snip" -> snip l (toInt e.[1]) (toInt e.[2]) (toInt e.[3]) e.[5]
         | "insert" -> insert l (toInt e.[1]) (toInt e.[2]) (toInt e.[3]) e.[4]
         | "delete" -> delete l (toInt e.[1]) (toInt e.[2]) (toInt e.[3]) (toInt e.[4])
+        | "duplicate" -> duplicate l (toInt e.[1]) (toInt e.[2]) (toInt e.[3])
+        | "loss" -> loss l (toInt e.[1]) (toInt e.[2])
+        | "fission" -> fission l (toInt e.[1]) (toInt e.[2]) (toInt e.[3]) (toInt e.[4])
+        | "fusion" -> fusion l (toInt e.[1]) (toInt e.[2]) (toInt e.[3])
+        | "speciation" -> speciation l (toInt e.[1]) (toInt e.[2])
         | _ -> l
         
 module IO =

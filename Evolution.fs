@@ -43,12 +43,15 @@ module DNA =
             )
                     
 type Species = { 
-    speciesId: string; 
-    geneId: string; 
+    speciesId: int; 
+    geneId: int; 
     dna: DNA.Nucleobase list; 
     }
             
 module Events =
+
+    let toInt s =
+        Int32.Parse s
 
     let target l s g =
         l 
@@ -79,12 +82,12 @@ module Events =
         let result = 
             { speciesId = target.speciesId; 
                 geneId = target.geneId; 
-                dna = replace (Int32.Parse i) (n |> DNA.toDNA |> List.head) target.dna } 
+                dna = replace i (n |> DNA.toDNA |> List.head) target.dna } 
         result :: (filter l (fun x -> x <> target))
-        
+
     let insert l s g i str =
         let target = target l s g
-        let newDNA = split (Int32.Parse i) target.dna
+        let newDNA = split i target.dna
         let result = 
             { speciesId = target.speciesId; 
                 geneId = target.geneId; 
@@ -93,19 +96,19 @@ module Events =
     
     let delete l s g i len =
         let target = target l s g
-        let newDNA = split (Int32.Parse i) target.dna
+        let newDNA = split i target.dna
         let result = 
             { speciesId = target.speciesId; 
                 geneId = target.geneId; 
-                dna = (fst newDNA) @ (snd (split (Int32.Parse len) (snd newDNA))) }
+                dna = (fst newDNA) @ (snd (split len (snd newDNA))) }
         result :: (filter l (fun x -> x <> target))       
     
     let events l (e:string list) =
         match e.[0] with
-        | "create" -> create l e.[1] e.[2] e.[3]
-        | "snip" -> snip l e.[1] e.[2] e.[3] e.[5]
-        | "insert" -> insert l e.[1] e.[2] e.[3] e.[4]
-        | "delete" -> delete l e.[1] e.[2] e.[3] e.[4]
+        | "create" -> create l (toInt e.[1]) (toInt e.[2]) e.[3]
+        | "snip" -> snip l (toInt e.[1]) (toInt e.[2]) (toInt e.[3]) e.[5]
+        | "insert" -> insert l (toInt e.[1]) (toInt e.[2]) (toInt e.[3]) e.[4]
+        | "delete" -> delete l (toInt e.[1]) (toInt e.[2]) (toInt e.[3]) (toInt e.[4])
         | _ -> l
         
 module IO =
@@ -119,22 +122,22 @@ module IO =
     let writeLines filename l =
         use file = IO.File.CreateText filename
         l |> List.iter (fun elem -> 
-                        fprintfn file ">SE%s_G%s\n%s" 
+                        fprintfn file ">SE%d_G%d\n%s" 
                             elem.speciesId elem.geneId (DNA.toString elem.dna))
         
     let rec printLines l =
         match l with
         | [] -> printfn ""
         | [head] -> 
-            printfn ">SE%s_G%s\n%s" head.speciesId head.geneId (DNA.toString head.dna)
+            printfn ">SE%d_G%d\n%s" head.speciesId head.geneId (DNA.toString head.dna)
         | head::tail -> 
-            printfn ">SE%s_G%s\n%s" head.speciesId head.geneId (DNA.toString head.dna)
+            printfn ">SE%d_G%d\n%s" head.speciesId head.geneId (DNA.toString head.dna)
             printLines tail
 
-let input = IO.readLines @"/Users/alex/Desktop/Evolution/test10" 
+let input = IO.readLines @"/Users/alex/Repository/Evolution/test10" 
             |> Seq.toList
             |> List.map IO.split
 
 let output = List.fold (fun acc evt -> Events.events acc evt) ([]: Species list) input
             |> List.sort
-            |> IO.writeLines @"/Users/alex/Desktop/Evolution/test.fa"
+            |> IO.writeLines @"/Users/alex/Repository/Evolution/test.fa"

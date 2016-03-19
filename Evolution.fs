@@ -73,15 +73,13 @@ module Events =
         l |> List.filter f
     
     let create l s g d =
-        let dna = DNA.toDNA d
-        let newSE = { speciesId = s; geneId = g; dna = dna }
-        newSE :: l
+        { speciesId = s; geneId = g; dna = (DNA.toDNA d) } :: l
         
     let snip l s g i n =
         let target = target l s g
         let result = 
-            { speciesId = target.speciesId; 
-                geneId = target.geneId; 
+            { speciesId = s; 
+                geneId = g; 
                 dna = replace i (n |> DNA.toDNA |> List.head) target.dna } 
         result :: (filter l (fun x -> x <> target))
 
@@ -89,8 +87,8 @@ module Events =
         let target = target l s g
         let newDNA = split i target.dna
         let result = 
-            { speciesId = target.speciesId; 
-                geneId = target.geneId; 
+            { speciesId = s; 
+                geneId = g; 
                 dna = (fst newDNA) @ (DNA.toDNA str) @ (snd newDNA) }
         result :: (filter l (fun x -> x <> target))                               
     
@@ -98,15 +96,15 @@ module Events =
         let target = target l s g
         let newDNA = split i target.dna
         let result = 
-            { speciesId = target.speciesId; 
-                geneId = target.geneId; 
+            { speciesId = s; 
+                geneId = g; 
                 dna = (fst newDNA) @ (snd (split len (snd newDNA))) }
         result :: (filter l (fun x -> x <> target))       
     
     let duplicate l s g1 g2 =
         let target = target l s g2
         let result = 
-            { speciesId = target.speciesId; 
+            { speciesId = s; 
                 geneId = g1; 
                 dna = target.dna }
         result :: l
@@ -119,11 +117,11 @@ module Events =
         let target = target l s g2
         let newDNA = split i target.dna
         let result1 = 
-            { speciesId = target.speciesId; 
-                geneId = target.geneId; 
+            { speciesId = s; 
+                geneId = g2; 
                 dna = (fst newDNA) }
         let result2 = 
-            { speciesId = target.speciesId; 
+            { speciesId = s; 
                 geneId = g1; 
                 dna = (snd newDNA) }
         [result1; result2] @ (filter l (fun x -> x <> target))
@@ -132,8 +130,8 @@ module Events =
         let target1 = target l s g1
         let target2 = target l s g2
         let result = 
-            { speciesId = target1.speciesId; 
-                geneId = target1.geneId; 
+            { speciesId = s; 
+                geneId = g1; 
                 dna = target1.dna @ target2.dna }
         result :: (filter l (fun x -> x <> target1 && x <> target2))
     

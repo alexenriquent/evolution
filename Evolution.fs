@@ -51,9 +51,7 @@ module DNA =
         Int32.Parse str
 
     let target l s g =
-        l 
-        |> List.filter (fun x -> x.speciesId = s && x.geneId = g) 
-        |> List.head
+        l |> List.filter (fun x -> x.speciesId = s && x.geneId = g) 
 
     let replace i s =
         List.mapi (fun index x -> if index = i then s else x )
@@ -73,79 +71,106 @@ module DNA =
         { speciesId = s; geneId = g; dna = (toDNA d) } :: l
         
     let snip l s g i n =
-        let target = target l s g
-        let result = 
-            { speciesId = s; 
-                geneId = g; 
-                dna = replace i (n |> toDNA |> List.head) target.dna } 
-        result :: (filter l (fun x -> x <> target))
+        match (target l s g) with
+        | [] -> l
+        | _ ->
+            let target = target l s g |> List.head
+            let result = 
+                { speciesId = s; 
+                    geneId = g; 
+                    dna = replace i (n |> toDNA |> List.head) target.dna } 
+            result :: (filter l (fun x -> x <> target))
 
     let insert l s g i str =
-        let target = target l s g
-        let newDNA = split i target.dna
-        let result = 
-            { speciesId = s; 
-                geneId = g; 
-                dna = (fst newDNA) @ (toDNA str) @ (snd newDNA) }
-        result :: (filter l (fun x -> x <> target))                               
+        match (target l s g) with
+        | [] -> l
+        | _ ->
+            let target = target l s g |> List.head
+            let newDNA = split i target.dna
+            let result = 
+                { speciesId = s; 
+                    geneId = g; 
+                    dna = (fst newDNA) @ (toDNA str) @ (snd newDNA) }
+            result :: (filter l (fun x -> x <> target))                               
     
     let delete l s g i len =
-        let target = target l s g
-        let newDNA = split i target.dna
-        let result = 
-            { speciesId = s; 
-                geneId = g; 
-                dna = (fst newDNA) @ (snd (split len (snd newDNA))) }
-        result :: (filter l (fun x -> x <> target))       
+        match (target l s g) with
+        | [] -> l
+        | _ ->
+            let target = target l s g |> List.head
+            let newDNA = split i target.dna
+            let result = 
+                { speciesId = s; 
+                    geneId = g; 
+                    dna = (fst newDNA) @ (snd (split len (snd newDNA))) }
+            result :: (filter l (fun x -> x <> target))       
     
     let duplicate l s g1 g2 =
-        let target = target l s g2
-        let result = 
-            { speciesId = s; 
-                geneId = g1; 
-                dna = target.dna }
-        result :: l
+        match (target l s g2) with
+        | [] -> l
+        | _ ->
+            let target = target l s g2 |> List.head
+            let result = 
+                { speciesId = s; 
+                    geneId = g1; 
+                    dna = target.dna }
+            result :: l
         
     let loss l s g =
-        let target = target l s g
-        filter l (fun x -> x <> target)
+        match (target l s g) with
+        | [] -> l
+        | _ ->
+            let target = target l s g |> List.head
+            filter l (fun x -> x <> target)
         
-    let fission l s g1 g2 i =
-        let target = target l s g2
-        let newDNA = split i target.dna
-        let result1 = 
-            { speciesId = s; 
-                geneId = g2; 
-                dna = (fst newDNA) }
-        let result2 = 
-            { speciesId = s; 
-                geneId = g1; 
-                dna = (snd newDNA) }
-        [result1; result2] @ (filter l (fun x -> x <> target))
+    let fission l s g1 g2 i =        
+        match (target l s g2) with
+        | [] -> l
+        | _ ->
+            let target = target l s g2 |> List.head
+            let newDNA = split i target.dna
+            let result1 = 
+                { speciesId = s; 
+                    geneId = g2; 
+                    dna = (fst newDNA) }
+            let result2 = 
+                { speciesId = s; 
+                    geneId = g1; 
+                    dna = (snd newDNA) }
+            [result1; result2] @ (filter l (fun x -> x <> target))
         
     let fusion l s g1 g2 =
-        let target1 = target l s g1
-        let target2 = target l s g2
-        let result = 
-            { speciesId = s; 
-                geneId = g1; 
-                dna = target1.dna @ target2.dna }
-        result :: (filter l (fun x -> x <> target1 && x <> target2))
+        match (target l s g1) with
+        | [] -> l
+        | _ ->
+            match (target l s g2) with
+            | [] -> l
+            | _ ->
+                let target1 = target l s g1 |> List.head
+                let target2 = target l s g2 |> List.head
+                let result = 
+                    { speciesId = s; 
+                        geneId = g1; 
+                        dna = target1.dna @ target2.dna }
+                result :: (filter l (fun x -> x <> target1 && x <> target2))
     
     let speciation l s1 s2 =
         let target = l |> List.filter (fun x -> x.speciesId = s2)
-        let rec newSpecies l s =
-            match l with
-            | [] -> []
-            | [head] -> 
-                { speciesId = s; 
-                geneId = head.geneId; 
-                dna = head.dna } :: []
-            | head::tail ->
-                { speciesId = s; 
-                geneId = head.geneId; 
-                dna = head.dna } :: newSpecies tail s
-        (newSpecies target s1) @ l
+        match target with
+        | [] -> l
+        | _ ->
+            let rec newSpecies l s =
+                match l with
+                | [] -> []
+                | [head] -> 
+                    { speciesId = s; 
+                    geneId = head.geneId; 
+                    dna = head.dna } :: []
+                | head::tail ->
+                    { speciesId = s; 
+                    geneId = head.geneId; 
+                    dna = head.dna } :: newSpecies tail s
+            (newSpecies target s1) @ l
                          
     let events l (e:string list) =
         match e.[0] with

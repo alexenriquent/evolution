@@ -4,7 +4,7 @@ module DNA =
 
     type Nucleobase = A | C | G | T  
     type ParsedChar = ValidBase of Nucleobase | InvalidBase of char
-    type Species = { 
+    type DNA = { 
         speciesId: int; 
         geneId: int; 
         dna: Nucleobase list; 
@@ -213,6 +213,6 @@ let input = IO.readLines @"/Users/alex/Repository/Evolution/test10"
             |> Seq.toList
             |> List.map IO.split
 
-let output = List.fold (fun acc evt -> DNA.events acc evt) ([]: DNA.Species list) input
+let output = List.fold (fun acc evt -> DNA.events acc evt) ([]: DNA.DNA list) input
             |> List.sort
             |> IO.writeLines @"/Users/alex/Repository/Evolution/test.fa"

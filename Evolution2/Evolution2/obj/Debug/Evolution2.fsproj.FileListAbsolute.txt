@@ -1,0 +1,8 @@
+Z:\Repository\Evolution\Evolution2\Evolution2\bin\Debug\Evolution2.exe.config
+Z:\Repository\Evolution\Evolution2\Evolution2\bin\Debug\Evolution2.XML
+Z:\Repository\Evolution\Evolution2\Evolution2\bin\Debug\Evolution2.exe
+Z:\Repository\Evolution\Evolution2\Evolution2\bin\Debug\Evolution2.pdb
+Z:\Repository\Evolution\Evolution2\Evolution2\bin\Debug\FSharp.Core.dll
+Z:\Repository\Evolution\Evolution2\Evolution2\bin\Debug\FSharp.Core.xml
+Z:\Repository\Evolution\Evolution2\Evolution2\obj\Debug\Evolution2.exe
+Z:\Repository\Evolution\Evolution2\Evolution2\obj\Debug\Evolution2.pdb

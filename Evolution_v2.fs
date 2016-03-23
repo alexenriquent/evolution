@@ -21,7 +21,8 @@ module DNA =
         | T -> 'T'
         
     let toString l =
-        l
+        let convertedList = List.ofSeq(l)
+        convertedList
         |> List.map nucleobaseToChar
         |> Array.ofList
         |> String

@@ -6,3 +6,11 @@
 \\mac\home\documents\visual studio 2015\Projects\Evolution1\Evolution1\bin\Debug\FSharp.Core.xml
 \\mac\home\documents\visual studio 2015\Projects\Evolution1\Evolution1\obj\Debug\Evolution1.exe
 \\mac\home\documents\visual studio 2015\Projects\Evolution1\Evolution1\obj\Debug\Evolution1.pdb
+\\Mac\Home\Repository\Evolution\Evolution1\Evolution1\bin\Debug\Evolution1.exe.config
+\\Mac\Home\Repository\Evolution\Evolution1\Evolution1\bin\Debug\Evolution1.XML
+\\Mac\Home\Repository\Evolution\Evolution1\Evolution1\bin\Debug\Evolution1.exe
+\\Mac\Home\Repository\Evolution\Evolution1\Evolution1\bin\Debug\Evolution1.pdb
+\\Mac\Home\Repository\Evolution\Evolution1\Evolution1\bin\Debug\FSharp.Core.dll
+\\Mac\Home\Repository\Evolution\Evolution1\Evolution1\bin\Debug\FSharp.Core.xml
+\\Mac\Home\Repository\Evolution\Evolution1\Evolution1\obj\Debug\Evolution1.exe
+\\Mac\Home\Repository\Evolution\Evolution1\Evolution1\obj\Debug\Evolution1.pdb

@@ -4,21 +4,16 @@ module DNA =
 
     type Nucleobase = A | C | G | T  
     type ParsedChar = ValidBase of Nucleobase | InvalidBase of char
-    type Genome = { 
-        speciesId: int; 
-        geneId: int; 
-        dna: Nucleobase list; 
-        }
         
-    let nucleobaseToChar n =
-        match n with
+    let nucleobaseToChar nucleobase =
+        match nucleobase with
         | A -> 'A'
         | C -> 'C'
         | G -> 'G'
         | T -> 'T'
         
-    let toString l =
-        l
+    let toString dnaList =
+        dnaList
         |> List.map nucleobaseToChar
         |> Array.ofList
         |> String
@@ -38,153 +33,110 @@ module DNA =
     
     let toDNA str =
         toNucleobaseList str
-        |> List.choose(
+        |> List.choose (
             function
             | ValidBase b -> 
                 Some b
             | InvalidBase ch -> 
-                eprintfn "'%c' is invalid" ch
                 None
             )
             
     let Int str =
         Int32.Parse str
-
-    let target l s g =
-        l |> List.filter (fun x -> x.speciesId = s && x.geneId = g) 
-
-    let replace i s =
-        List.mapi (fun index x -> if index = i then s else x )
-            
-    let split i t =
-        let rec splitList i t acc =
-            match t with
-            | [] -> List.rev acc, []
-            | _ when i = 0 -> List.rev acc, t
-            | head::tail -> splitList (i-1) tail (head::acc)
-        splitList i t []
         
-    let filter l f =
-        l |> List.filter f
+    let replace index value =
+        List.mapi (fun i x -> 
+                    match i = index with
+                    | true -> value
+                    | false -> x)
     
-    let create l s g d =
-        { speciesId = s; geneId = g; dna = (toDNA d) } :: l
+    let split index dna =
+        let fstDNA = dna |> Seq.take index |> Seq.toList
+        let sndDNA = dna |> Seq.skip index |> Seq.toList
+        (fstDNA, sndDNA)
         
-    let snip l s g i n =
-        match (target l s g) with
-        | [] -> l
-        | _ ->
-            let target = target l s g |> List.head
-            let result = 
-                { speciesId = s; 
-                    geneId = g; 
-                    dna = replace i (n |> toDNA |> List.head) target.dna } 
-            result :: (filter l (fun x -> x <> target))
-
-    let insert l s g i str =
-        match (target l s g) with
-        | [] -> l
-        | _ ->
-            let target = target l s g |> List.head
-            let newDNA = split i target.dna
-            let result = 
-                { speciesId = s; 
-                    geneId = g; 
-                    dna = (fst newDNA) @ (toDNA str) @ (snd newDNA) }
-            result :: (filter l (fun x -> x <> target))                               
+    let create map species gene dna =
+        Map.add (species, gene) (toDNA dna) map
+        
+    let snip map species gene index dna =
+        match map |> Map.containsKey (species, gene) with
+        | false -> map
+        | true ->
+            let newDNA = replace index (dna |> toDNA |> List.head) 
+                            (map |> Map.find (species, gene))
+            map |> Map.remove (species, gene) 
+                |> Map.add (species, gene) newDNA
     
-    let delete l s g i len =
-        match (target l s g) with
-        | [] -> l
-        | _ ->
-            let target = target l s g |> List.head
-            let newDNA = split i target.dna
-            let result = 
-                { speciesId = s; 
-                    geneId = g; 
-                    dna = (fst newDNA) @ (snd (split len (snd newDNA))) }
-            result :: (filter l (fun x -> x <> target))       
+    let insert map species gene index dna =
+        match map |> Map.containsKey (species, gene) with
+        | false -> map
+        | true ->
+            let newDNA = split index (map |> Map.find (species, gene))
+            map |> Map.remove (species, gene) 
+                |> Map.add (species, gene) 
+                    ((fst newDNA) @ (toDNA dna) @ (snd newDNA))
     
-    let duplicate l s g1 g2 =
-        match (target l s g2) with
-        | [] -> l
-        | _ ->
-            let target = target l s g2 |> List.head
-            let result = 
-                { speciesId = s; 
-                    geneId = g1; 
-                    dna = target.dna }
-            result :: l
-        
-    let loss l s g =
-        match (target l s g) with
-        | [] -> l
-        | _ ->
-            let target = target l s g |> List.head
-            filter l (fun x -> x <> target)
-        
-    let fission l s g1 g2 i =        
-        match (target l s g2) with
-        | [] -> l
-        | _ ->
-            let target = target l s g2 |> List.head
-            let newDNA = split i target.dna
-            let result1 = 
-                { speciesId = s; 
-                    geneId = g2; 
-                    dna = (fst newDNA) }
-            let result2 = 
-                { speciesId = s; 
-                    geneId = g1; 
-                    dna = (snd newDNA) }
-            [result1; result2] @ (filter l (fun x -> x <> target))
-        
-    let fusion l s g1 g2 =
-        match (target l s g1) with
-        | [] -> l
-        | _ ->
-            match (target l s g2) with
-            | [] -> l
-            | _ ->
-                let target1 = target l s g1 |> List.head
-                let target2 = target l s g2 |> List.head
-                let result = 
-                    { speciesId = s; 
-                        geneId = g1; 
-                        dna = target1.dna @ target2.dna }
-                result :: (filter l (fun x -> x <> target1 && x <> target2))
+    let delete map species gene index length =
+        match map |> Map.containsKey (species, gene) with
+        | false -> map
+        | true ->
+            let newDNA = split index (map |> Map.find (species, gene))
+            map |> Map.remove (species, gene) 
+                |> Map.add (species, gene) 
+                    ((fst newDNA) @ (snd (split length (snd newDNA))))           
     
-    let speciation l s1 s2 =
-        let target = l |> List.filter (fun x -> x.speciesId = s2)
-        match target with
-        | [] -> l
-        | _ ->
-            let rec newSpecies l s =
-                match l with
-                | [] -> []
-                | [head] -> 
-                    { speciesId = s; 
-                    geneId = head.geneId; 
-                    dna = head.dna } :: []
-                | head::tail ->
-                    { speciesId = s; 
-                    geneId = head.geneId; 
-                    dna = head.dna } :: newSpecies tail s
-            (newSpecies target s1) @ l
-                         
-    let events l (e:string list) =
-        match e.[0] with
-        | "create" -> create l (Int e.[1]) (Int e.[2]) e.[3]
-        | "snip" -> snip l (Int e.[1]) (Int e.[2]) (Int e.[3]) e.[5]
-        | "insert" -> insert l (Int e.[1]) (Int e.[2]) (Int e.[3]) e.[4]
-        | "delete" -> delete l (Int e.[1]) (Int e.[2]) (Int e.[3]) (Int e.[4])
-        | "duplicate" -> duplicate l (Int e.[1]) (Int e.[2]) (Int e.[3])
-        | "loss" -> loss l (Int e.[1]) (Int e.[2])
-        | "fission" -> fission l (Int e.[1]) (Int e.[2]) (Int e.[3]) (Int e.[4])
-        | "fusion" -> fusion l (Int e.[1]) (Int e.[2]) (Int e.[3])
-        | "speciation" -> speciation l (Int e.[1]) (Int e.[2])
-        | _ -> l
-
+    let duplicate map species gene1 gene2 =
+        match map |> Map.containsKey (species, gene2) with
+        | false -> map
+        | true ->
+            map |> Map.add (species, gene1) (map |> Map.find (species, gene2))
+    
+    let loss map species gene =
+        map |> Map.remove (species, gene)
+        
+    let fission map species gene1 gene2 index =
+        match map |> Map.containsKey (species, gene2) with
+        | false -> map
+        | true ->
+            let newDNA = split index (map |> Map.find (species, gene2))
+            map |> Map.remove (species, gene2) 
+                |> Map.add (species, gene2) (fst newDNA)
+                |> Map.add (species, gene1) (snd newDNA)
+                
+    let fusion map species gene1 gene2 =
+        match map |> Map.containsKey (species, gene1) with
+        | false -> map
+        | true ->
+            match map |> Map.containsKey (species, gene2) with
+            | false -> map
+            | true ->
+                let newDNA = (map |> Map.find (species, gene1)) @
+                                (map |> Map.find (species, gene2))
+                map |> Map.remove (species, gene1) 
+                    |> Map.remove (species, gene2)
+                    |> Map.add (species, gene1) newDNA   
+                    
+    let speciation map species1 species2 =
+        let species = map |> Map.filter (fun key value -> (fst key) = species2)
+        match species |> Map.isEmpty with
+        | true -> map
+        | false ->
+            Map.fold (fun state key value -> 
+                        state |> Map.add (species1, snd key) value) map species
+                        
+    let events map event =
+        match event |> List.head with
+        | "create" -> create map (Int event.[1]) (Int event.[2]) event.[3]
+        | "snip" -> snip map (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
+        | "insert" -> insert map (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
+        | "delete" -> delete map (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "duplicate" -> duplicate map (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "loss" -> loss map (Int event.[1]) (Int event.[2])
+        | "fission" -> fission map (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "fusion" -> fusion map (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "speciation" -> speciation map (Int event.[1]) (Int event.[2])
+        | _ -> map
+    
 module IO =
     open DNA
     
@@ -193,19 +145,20 @@ module IO =
     
     let split (str:string) =
         str.Split [|','|] |> Array.toList
-        
-    let writeLines filename l =
+    
+    let writeLines filename map =
         use file = IO.File.CreateText filename
-        l |> List.iter (fun elem -> 
+        map |> Map.iter (fun key value -> 
                         fprintfn file ">SE%d_G%d\n%s" 
-                            elem.speciesId elem.geneId (toString elem.dna))
+                            (fst key) (snd key) (toString value))
 
 [<EntryPoint>]
 let main argv = 
-    let input = IO.readLines "Tests/test10" 
-                |> Seq.toList
-                |> List.map IO.split
-    let output = List.fold (fun acc evt -> DNA.events acc evt) ([]: DNA.Genome list) input
-                |> List.sort
-                |> IO.writeLines "Results/test_v1.fa"
+    IO.readLines "Tests/test10" 
+    |> Seq.toList
+    |> List.map IO.split
+    |> List.mapi (fun key value -> key, value)
+    |> Map.ofList
+    |> Map.fold (fun state key value -> DNA.events state value) Map.empty
+    |> IO.writeLines "Results/test10.fa" 
     0 // return an integer exit code

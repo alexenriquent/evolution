@@ -6,3 +6,11 @@ Z:\Repository\Evolution\Evolution2\Evolution2\bin\Debug\FSharp.Core.dll
 Z:\Repository\Evolution\Evolution2\Evolution2\bin\Debug\FSharp.Core.xml
 Z:\Repository\Evolution\Evolution2\Evolution2\obj\Debug\Evolution2.exe
 Z:\Repository\Evolution\Evolution2\Evolution2\obj\Debug\Evolution2.pdb
+\\Mac\Home\Repository\Evolution\Evolution2\Evolution2\bin\Debug\Evolution2.exe.config
+\\Mac\Home\Repository\Evolution\Evolution2\Evolution2\bin\Debug\Evolution2.XML
+\\Mac\Home\Repository\Evolution\Evolution2\Evolution2\bin\Debug\Evolution2.exe
+\\Mac\Home\Repository\Evolution\Evolution2\Evolution2\bin\Debug\Evolution2.pdb
+\\Mac\Home\Repository\Evolution\Evolution2\Evolution2\bin\Debug\FSharp.Core.dll
+\\Mac\Home\Repository\Evolution\Evolution2\Evolution2\bin\Debug\FSharp.Core.xml
+\\Mac\Home\Repository\Evolution\Evolution2\Evolution2\obj\Debug\Evolution2.exe
+\\Mac\Home\Repository\Evolution\Evolution2\Evolution2\obj\Debug\Evolution2.pdb

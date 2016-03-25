@@ -5,23 +5,18 @@ module DNA =
 
     type Nucleobase = A | C | G | T  
     type ParsedChar = ValidBase of Nucleobase | InvalidBase of char
-    type Genome = { 
-        speciesId: int; 
-        geneId: int; 
-        dna: List<Nucleobase>; 
-        }
+    
+    let genomes = new SortedDictionary<int * int, List<Nucleobase>>()
         
-    let DNAList = new List<Genome>()
-
-    let nucleobaseToChar n =
-        match n with
+    let nucleobaseToChar nucleobase =
+        match nucleobase with
         | A -> 'A'
         | C -> 'C'
         | G -> 'G'
         | T -> 'T'
         
-    let toString l =
-        let convertedList = List.ofSeq(l)
+    let toString dnaList =
+        let convertedList = List.ofSeq(dnaList)
         convertedList
         |> List.map nucleobaseToChar
         |> Array.ofList
@@ -56,29 +51,74 @@ module DNA =
             
     let Int str =
         Int32.Parse str
+    
+    let create species gene dna =
+        genomes.Add((species, gene), toDNA dna)
+    
+    let snip species gene index dna =
+        match genomes.ContainsKey((species, gene)) with
+        | false -> ()
+        | true -> genomes.[(species, gene)].[index] <- (dna |> toDNA |> (fun x -> x.[0]))
         
-    let split i t =
-        let rec splitList i t acc =
-            match t with
-            | [] -> List.rev acc, []
-            | _ when i = 0 -> List.rev acc, t
-            | head::tail -> splitList (i-1) tail (head::acc)
-        splitList i t []
-            
-    let create s g d =
-        DNAList.Add({ speciesId = s; geneId = g; dna = (toDNA d) })
+    let insert species gene index dna =
+        match genomes.ContainsKey((species, gene)) with
+        | false -> ()
+        | true -> genomes.[(species, gene)].InsertRange(index, (toDNA dna))  
         
-    let snip s g i n =
-        if DNAList.Exists(fun x -> x.speciesId = s && x.geneId = g) then
-            let index = DNAList.FindIndex(fun x -> x.speciesId = s && x.geneId = g)
-            DNAList.[index].dna.[i] <- (n |> toDNA |> (fun x -> x.[0]))          
+    let delete species gene index length =
+        match genomes.ContainsKey((species, gene)) with
+        | false -> ()
+        | true -> genomes.[(species, gene)].RemoveRange(index, length)
+        
+    let duplicate species gene1 gene2 =
+        match genomes.ContainsKey((species, gene2)) with
+        | false -> ()
+        | true -> genomes.Add((species, gene1), new List<Nucleobase>(genomes.[(species, gene2)]))
+     
+    let loss species gene =
+        match genomes.ContainsKey((species, gene)) with
+        | false -> ()
+        | true -> genomes.Remove((species, gene)) |> ignore
+        
+    let fission species gene1 gene2 index =
+        match genomes.ContainsKey((species, gene2)) with
+        | false -> ()
+        | true -> 
+            genomes.Add((species, gene1), new List<Nucleobase>(genomes.[species, gene2].
+                                GetRange(index, genomes.[species, gene2].Count - index)))
+            genomes.[(species, gene2)].RemoveRange(index, genomes.[species, gene2].Count - index)                
             
-    let events (e: string list) =
-        match e.[0] with
-        | "create" -> create (Int e.[1]) (Int e.[2]) e.[3]
-        | "snip" -> snip (Int e.[1]) (Int e.[2]) (Int e.[3]) e.[5]
+    let fusion species gene1 gene2 =
+        match genomes.ContainsKey((species, gene1)) with
+        | false -> ()
+        | true -> 
+            match genomes.ContainsKey((species, gene2)) with
+            | false -> ()
+            | true -> 
+                genomes.[(species, gene1)].AddRange(new List<Nucleobase>(genomes.[species, gene2]))
+                loss species gene2
+    
+    let speciation species1 species2 =
+        let species = genomes |> Seq.filter (fun x -> (fst x.Key) = species2)
+        match species |> Seq.isEmpty with
+        | true -> ()
+        | false ->
+            species |> Seq.toArray
+                    |> Array.iter (fun x -> genomes.Add((species1, (snd x.Key)), new List<Nucleobase>(x.Value)))
+                
+    let events (event: string list) =
+        match (event |> List.head) with
+        | "create" -> create (Int event.[1]) (Int event.[2]) event.[3]
+        | "snip" -> snip (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
+        | "insert" -> insert (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
+        | "delete" -> delete (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "duplicate" -> duplicate (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "loss" -> loss (Int event.[1]) (Int event.[2])
+        | "fission" -> fission (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "fusion" -> fusion (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "speciation" -> speciation (Int event.[1]) (Int event.[2])
         | _ -> ()
-            
+
 module IO =
     open DNA
     
@@ -88,18 +128,18 @@ module IO =
     let split (str:string) =
         str.Split [|','|] |> Array.toList
         
-    let writeLines filename l =
+    let writeLines filename =
         use file = IO.File.CreateText filename
-        l |> Seq.iter (fun elem -> 
+        genomes |> Seq.iter (fun x -> 
                         fprintfn file ">SE%d_G%d\n%s" 
-                            elem.speciesId elem.geneId (toString elem.dna))
+                            (fst x.Key) (snd x.Key) (toString x.Value))
 
 [<EntryPoint>]
 let main argv = 
-    IO.readLines "Tests/test1" 
+    IO.readLines "Tests/test10" 
     |> Seq.toList
     |> List.map IO.split
     |> List.iter (DNA.events)
 
-    IO.writeLines "Results/test_v2.fa" DNA.DNAList
+    IO.writeLines "Results/test10.fa"
     0 // return an integer exit code

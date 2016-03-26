@@ -135,7 +135,7 @@ module Events =
     open Utilities
     
     /// <summary>
-    /// Creates a new gene and retursns a new map containing that gene.
+    /// Creates a new gene and returns a new map containing that gene.
     /// </summary>
     /// <param name="genes">A map containing all genes</param>
     /// <param name="species">An integer representing a species ID</param>

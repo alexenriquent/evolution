@@ -2,5 +2,242 @@
 <doc>
 <assembly><name>Evolution1</name></assembly>
 <members>
+<member name="M:Program.main(System.String[])">
+ <summary>
+ The Main method for the application.
+ </summary>
+ <param name="args">A list of command line arguments</param>
+</member>
+<member name="M:Program.IO.writeLines(System.String,Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}})">
+ <summary>
+ Writes a list to file.
+ </summary>
+ <param name="filename">A file path/filename</param>
+ <param name="map">A map containing all genes</param>
+</member>
+<member name="M:Program.IO.split(System.String)">
+ <summary>
+ Splits each element in a line and adds it to a list.
+ </summary>
+ <param name="str">The input string to be split</param>
+ <returns>A list of split string</returns>
+</member>
+<member name="M:Program.IO.readLines(System.String)">
+ <summary>
+ Reads the input file and adds each line to a list
+ of strings.
+ </summary>
+ <param name="path">A file path/filename</param>
+ <returns>A sequence containing all lines from file</returns>
+</member>
+<member name="T:Program.IO">
+ <summary>
+ This module contains the I/O operations.
+ </summary>    
+</member>
+<member name="M:Program.Events.events(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}},Microsoft.FSharp.Collections.FSharpList{System.String})">
+ <summary>
+ Different types of events which alter existing genes
+ in various ways.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="action">An array containing events</param> 
+ <returns>A new map containing all genes</returns>                  
+</member>
+<member name="M:Program.Events.speciation``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},``2},``0,``0)">
+ <summary>
+ Creates a new species from an existing species.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="species1">An integer representing the new species
+ to be created</param>
+ <param name="species2">An integer representing the existing species 
+ to be copied</param> 
+ <returns>A new map containing all genes including the new set of genes</returns>                
+</member>
+<member name="M:Program.Events.fusion``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{``2}},``0,``1,``1)">
+ <summary>
+ Fuses two existing genes to create a new gene.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene1">An integer representing the gene to be fused</param>
+ <param name="gene2">An integer representing the gene to be removed</param>
+ <returns>A new map containing all genes including the fused gene</returns>            
+</member>
+<member name="M:Program.Events.fission``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{``2}},``0,``1,``1,System.Int32)">
+ <summary>
+ Splits an existing gene into 2 genes.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene1">An integer representing the gene to be created</param>
+ <param name="gene2">An integer representing the gene to be split</param>
+ <param name="index">An integer representing the spliting index</param> 
+ <returns>A new map containing all genes including the split genes</returns>  
+</member>
+<member name="M:Program.Events.loss``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},``2},``0,``1)">
+ <summary>
+ Removes an existing gene from an existing species.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene">An integer representing a gene ID</param>
+ <returns>A new map containing all genes except for the removed gene</returns>
+</member>
+<member name="M:Program.Events.duplicate``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},``2},``0,``1,``1)">
+ <summary>
+ Adds a new gene to an existing species that is an exact
+ copy of another gene within the same species.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene1">An integer representing the gene to be added</param>
+ <param name="gene2">An integer representing the gene to be copied</param>
+ <returns>A new map containing all genes including the duplicated gene</returns>
+</member>
+<member name="M:Program.Events.delete``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{``2}},``0,``1,System.Int32,System.Int32)">
+ <summary>
+ Deletes a section of DNA from an existing gene.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene">An integer representing a gene ID</param>
+ <param name="index">An index to start the delete operation</param>
+ <param name="length">Length of the section to be deleted</param>
+ <returns>A new map containing all genes including the modified gene</returns>
+</member>
+<member name="M:Program.Events.insert``2(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}},``0,``1,System.Int32,System.String)">
+ <summary>
+ Inserts a new sequence of DNA to an existing gene.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene">An integer representing a gene ID</param>
+ <param name="index">An integer representing the index to be inserted</param>
+ <param name="dna">A string representing a sequence of DNA</param>
+ <returns>A new map containing all genes including the modified gene</returns>
+</member>
+<member name="M:Program.Events.snip``2(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}},``0,``1,System.Int32,System.String)">
+ <summary>
+ A single nucleotide polymorphism (SNP).
+ Replaces a single nucleobase (or nucleotide) within
+ an existing gene with a different nucleobase.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene">An integer representing a gene ID</param>
+ <param name="index">An integer representing the index of 
+ nucleobase to be replaced</param>
+ <param name="dna">A string representing a single nucleobase</param>
+ <returns>A new map containing all genes including the modified gene</returns>
+</member>
+<member name="M:Program.Events.create``2(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}},``0,``1,System.String)">
+ <summary>
+ Creates a new gene and retursns a new map containing that gene.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene">An integer representing a gene ID</param>
+ <param name="dna">A string representing a sequence of DNA</param>
+ <returns>A new map containing all genes including the newly created gene</returns>    
+</member>
+<member name="T:Program.Events">
+ <summary>
+ This module contains the evolution events.
+ </summary>
+</member>
+<member name="M:Program.Utilities.split``1(System.Int32,System.Collections.Generic.IEnumerable{``0})">
+ <summary>
+ Splits a list and returns a tuple containing the first
+ and second parts of that list.
+ </summary>
+ <param name="index">An integer representing the index 
+ of the list to be split</param>
+ <param name="list">The list to be split</param>
+ <returns>A tuple containing the first
+ and second parts of that list</returns>  
+</member>
+<member name="M:Program.Utilities.replace``1(System.Int32,``0)">
+ <summary>
+ Returns a new list which one of the elements
+ has been replaced with another element. 
+ </summary>
+ <param name="index">An integer representing the index 
+ of the element to be replaces</param>
+ <param name="value">A generic type of the value to replace</param>
+ <returns>A new list which one of the elements
+ has been replaced</returns>     
+</member>
+<member name="M:Program.Utilities.Int(System.String)">
+ <summary>
+ Parses a string to an integer.
+ </summary>
+ <param name="str">A string</param>
+ <returns>An integer</returns> 
+</member>
+<member name="T:Program.Utilities">
+ <summary>
+ This module contains the helper functions used in
+ the evolution events.
+ </summary>
+</member>
+<member name="T:Program.DNA.ParsedChar">
+ <summary>
+ A single case union type of nucleobases after being parsed.
+ </summary>
+</member>
+<member name="T:Program.DNA.Nucleobase">
+ <summary>
+ A single case union type of nucleobases, including 
+ A (Adenine), C (Cytosine), G (Guanine) and T (Thymine).
+ A nucleobase is not just any character, therefore it has
+ to be from a limited set.
+ </summary>
+</member>
+<member name="M:Program.DNA.toDNA(System.String)">
+ <summary>
+ A top-level function to converts a string representing a
+ sequence of DNA to a list of valid bases by filtering out 
+ all the invalid bases.
+ </summary>
+ <param name="str">A string representing a sequence of DNA</param>
+ <returns>A list containing a sequence of DNA</returns> 
+</member>
+<member name="M:Program.DNA.toNucleobaseList(System.String)">
+ <summary>
+ Converts a string of nucleobases to a list.
+ </summary>
+ <param name="str">A string representing a sequence of DNA</param>
+ <returns>A list containing a sequence of DNA</returns> 
+</member>
+<member name="M:Program.DNA.charToNucleobase(System.Char)">
+ <summary>
+ Parses a character to a nucleobase.
+ This function parses a valid character into the ValidBase type
+ and an invalid character to the Invalidbase type. 
+ </summary>
+ <param name="ch">A character representing a single nucleobase</param>
+ <returns>A valid or invalid nucleobase</returns>  
+</member>
+<member name="M:Program.DNA.toString(Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase})">
+ <summary>
+ Converts a list of nucleobases to a string.
+ </summary>
+ <param name="dnaList">A list containing a sequence of DNA</param>
+ <returns>A string representing a sequence of DNA</returns>      
+</member>
+<member name="M:Program.DNA.nucleobaseToChar(Program.DNA.Nucleobase)">
+ <summary>
+ Parses a nucleobase to a character.
+ </summary>
+ <param name="nucleobase">A single nucleobase</param>
+ <returns>A character representing the input nucleobase</returns>  
+</member>
+<member name="T:Program.DNA">
+ <summary>
+ This module contains the DNA-related functions.
+ </summary>
+</member>
 </members>
 </doc>

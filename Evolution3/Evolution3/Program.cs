@@ -12,7 +12,7 @@ namespace Evolution3 {
     class Program {
 
         /// <summary>
-        /// The Main method for the application
+        /// The Main method for the application.
         /// </summary>
         /// <param name="args">A list of command line arguments</param>
         static void Main(string[] args) {

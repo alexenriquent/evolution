@@ -40,7 +40,9 @@ module DNA =
             | InvalidBase ch -> 
                 None
             )
-            
+
+module Utilities =
+    
     let Int str =
         Int32.Parse str
         
@@ -54,90 +56,94 @@ module DNA =
         let fstDNA = dna |> Seq.take index |> Seq.toList
         let sndDNA = dna |> Seq.skip index |> Seq.toList
         (fstDNA, sndDNA)
+
+module Events =
+
+    open DNA
+    open Utilities
         
-    let create map species gene dna =
-        Map.add (species, gene) (toDNA dna) map
+    let create genomes species gene dna =
+        Map.add (species, gene) (toDNA dna) genomes
         
-    let snip map species gene index dna =
-        match map |> Map.containsKey (species, gene) with
-        | false -> map
+    let snip genomes species gene index dna =
+        match genomes |> Map.containsKey (species, gene) with
+        | false -> genomes
         | true ->
             let newDNA = replace index (dna |> toDNA |> List.head) 
-                            (map |> Map.find (species, gene))
-            map |> Map.remove (species, gene) 
-                |> Map.add (species, gene) newDNA
+                            (genomes |> Map.find (species, gene))
+            genomes |> Map.remove (species, gene) 
+                    |> Map.add (species, gene) newDNA
     
-    let insert map species gene index dna =
-        match map |> Map.containsKey (species, gene) with
-        | false -> map
+    let insert genomes species gene index dna =
+        match genomes |> Map.containsKey (species, gene) with
+        | false -> genomes
         | true ->
-            let newDNA = split index (map |> Map.find (species, gene))
-            map |> Map.remove (species, gene) 
+            let newDNA = split index (genomes |> Map.find (species, gene))
+            genomes |> Map.remove (species, gene) 
                 |> Map.add (species, gene) 
                     ((fst newDNA) @ (toDNA dna) @ (snd newDNA))
     
-    let delete map species gene index length =
-        match map |> Map.containsKey (species, gene) with
-        | false -> map
+    let delete genomes species gene index length =
+        match genomes |> Map.containsKey (species, gene) with
+        | false -> genomes
         | true ->
-            let newDNA = split index (map |> Map.find (species, gene))
-            map |> Map.remove (species, gene) 
-                |> Map.add (species, gene) 
+            let newDNA = split index (genomes |> Map.find (species, gene))
+            genomes |> Map.remove (species, gene) 
+                    |> Map.add (species, gene) 
                     ((fst newDNA) @ (snd (split length (snd newDNA))))           
     
-    let duplicate map species gene1 gene2 =
-        match map |> Map.containsKey (species, gene2) with
-        | false -> map
+    let duplicate genomes species gene1 gene2 =
+        match genomes |> Map.containsKey (species, gene2) with
+        | false -> genomes
         | true ->
-            map |> Map.add (species, gene1) (map |> Map.find (species, gene2))
+            genomes |> Map.add (species, gene1) (genomes |> Map.find (species, gene2))
     
-    let loss map species gene =
-        map |> Map.remove (species, gene)
+    let loss genomes species gene =
+        genomes |> Map.remove (species, gene)
         
-    let fission map species gene1 gene2 index =
-        match map |> Map.containsKey (species, gene2) with
-        | false -> map
+    let fission genomes species gene1 gene2 index =
+        match genomes |> Map.containsKey (species, gene2) with
+        | false -> genomes
         | true ->
-            let newDNA = split index (map |> Map.find (species, gene2))
-            map |> Map.remove (species, gene2) 
-                |> Map.add (species, gene2) (fst newDNA)
-                |> Map.add (species, gene1) (snd newDNA)
+            let newDNA = split index (genomes |> Map.find (species, gene2))
+            genomes |> Map.remove (species, gene2) 
+                    |> Map.add (species, gene2) (fst newDNA)
+                    |> Map.add (species, gene1) (snd newDNA)
                 
-    let fusion map species gene1 gene2 =
-        match map |> Map.containsKey (species, gene1) with
-        | false -> map
+    let fusion genomes species gene1 gene2 =
+        match genomes |> Map.containsKey (species, gene1) &&
+            genomes |> Map.containsKey (species, gene2) with
+        | false -> genomes
         | true ->
-            match map |> Map.containsKey (species, gene2) with
-            | false -> map
-            | true ->
-                let newDNA = (map |> Map.find (species, gene1)) @
-                                (map |> Map.find (species, gene2))
-                map |> Map.remove (species, gene1) 
+            let newDNA = (genomes |> Map.find (species, gene1)) @
+                            (genomes |> Map.find (species, gene2))
+            genomes |> Map.remove (species, gene1) 
                     |> Map.remove (species, gene2)
                     |> Map.add (species, gene1) newDNA   
                     
-    let speciation map species1 species2 =
-        let species = map |> Map.filter (fun key value -> (fst key) = species2)
+    let speciation genomes species1 species2 =
+        let species = genomes |> Map.filter (fun key value -> (fst key) = species2)
         match species |> Map.isEmpty with
-        | true -> map
+        | true -> genomes
         | false ->
             Map.fold (fun state key value -> 
-                        state |> Map.add (species1, snd key) value) map species
+                        state |> Map.add (species1, snd key) value) genomes species
                         
-    let events map event =
+    let events genomes event =
         match event |> List.head with
-        | "create" -> create map (Int event.[1]) (Int event.[2]) event.[3]
-        | "snip" -> snip map (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
-        | "insert" -> insert map (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
-        | "delete" -> delete map (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "duplicate" -> duplicate map (Int event.[1]) (Int event.[2]) (Int event.[3])
-        | "loss" -> loss map (Int event.[1]) (Int event.[2])
-        | "fission" -> fission map (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "fusion" -> fusion map (Int event.[1]) (Int event.[2]) (Int event.[3])
-        | "speciation" -> speciation map (Int event.[1]) (Int event.[2])
-        | _ -> map
+        | "create" -> create genomes (Int event.[1]) (Int event.[2]) event.[3]
+        | "snip" -> snip genomes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
+        | "insert" -> insert genomes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
+        | "delete" -> delete genomes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "duplicate" -> duplicate genomes (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "loss" -> loss genomes (Int event.[1]) (Int event.[2])
+        | "fission" -> fission genomes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "fusion" -> fusion genomes (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "speciation" -> speciation genomes (Int event.[1]) (Int event.[2])
+        | _ -> genomes
     
 module IO =
+
     open DNA
     
     let readLines path = 
@@ -159,6 +165,6 @@ let main argv =
     |> List.map IO.split
     |> List.mapi (fun key value -> key, value)
     |> Map.ofList
-    |> Map.fold (fun state key value -> DNA.events state value) Map.empty
+    |> Map.fold (fun state key value -> Events.events state value) Map.empty
     |> IO.writeLines "Results/test10.fa" 
     0 // return an integer exit code

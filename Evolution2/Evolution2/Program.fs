@@ -5,8 +5,6 @@ module DNA =
 
     type Nucleobase = A | C | G | T  
     type ParsedChar = ValidBase of Nucleobase | InvalidBase of char
-    
-    let genomes = new SortedDictionary<int * int, List<Nucleobase>>()
         
     let nucleobaseToChar nucleobase =
         match nucleobase with
@@ -48,9 +46,18 @@ module DNA =
             )
         |> List.iter (fun x -> nucleobaseList.Add(x))
         nucleobaseList
+
+module Utilities =
             
     let Int str =
         Int32.Parse str
+
+module Events =
+    
+    open DNA
+    open Utilities
+
+    let genomes = new SortedDictionary<int * int, List<Nucleobase>>()
     
     let create species gene dna =
         genomes.Add((species, gene), toDNA dna)
@@ -89,22 +96,21 @@ module DNA =
             genomes.[(species, gene2)].RemoveRange(index, genomes.[species, gene2].Count - index)                
             
     let fusion species gene1 gene2 =
-        match genomes.ContainsKey((species, gene1)) with
+        match genomes.ContainsKey((species, gene1)) && 
+            genomes.ContainsKey((species, gene2)) with
         | false -> ()
         | true -> 
-            match genomes.ContainsKey((species, gene2)) with
-            | false -> ()
-            | true -> 
-                genomes.[(species, gene1)].AddRange(new List<Nucleobase>(genomes.[species, gene2]))
-                loss species gene2
+            genomes.[(species, gene1)].AddRange(new List<Nucleobase>(genomes.[species, gene2]))
+            loss species gene2
     
     let speciation species1 species2 =
         let species = genomes |> Seq.filter (fun x -> (fst x.Key) = species2)
         match species |> Seq.isEmpty with
         | true -> ()
         | false ->
-            species |> Seq.toArray
-                    |> Array.iter (fun x -> genomes.Add((species1, (snd x.Key)), new List<Nucleobase>(x.Value)))
+            species 
+            |> Seq.toArray
+            |> Array.iter (fun x -> genomes.Add((species1, (snd x.Key)), new List<Nucleobase>(x.Value)))
                 
     let events (event: string list) =
         match (event |> List.head) with
@@ -120,7 +126,9 @@ module DNA =
         | _ -> ()
 
 module IO =
+
     open DNA
+    open Events
     
     let readLines path = 
         IO.File.ReadLines path
@@ -139,7 +147,7 @@ let main argv =
     IO.readLines "Tests/test10" 
     |> Seq.toList
     |> List.map IO.split
-    |> List.iter (DNA.events)
+    |> List.iter (Events.events)
 
     IO.writeLines "Results/test10.fa"
     0 // return an integer exit code

@@ -57,60 +57,60 @@ module Events =
     open DNA
     open Utilities
 
-    let genomes = new SortedDictionary<int * int, List<Nucleobase>>()
+    let genes = new SortedDictionary<int * int, List<Nucleobase>>()
     
     let create species gene dna =
-        genomes.Add((species, gene), toDNA dna)
+        genes.Add((species, gene), toDNA dna)
     
     let snip species gene index dna =
-        match genomes.ContainsKey((species, gene)) with
+        match genes.ContainsKey((species, gene)) with
         | false -> ()
-        | true -> genomes.[(species, gene)].[index] <- (dna |> toDNA |> (fun x -> x.[0]))
+        | true -> genes.[(species, gene)].[index] <- (dna |> toDNA |> (fun x -> x.[0]))
         
     let insert species gene index dna =
-        match genomes.ContainsKey((species, gene)) with
+        match genes.ContainsKey((species, gene)) with
         | false -> ()
-        | true -> genomes.[(species, gene)].InsertRange(index, (toDNA dna))  
+        | true -> genes.[(species, gene)].InsertRange(index, (toDNA dna))  
         
     let delete species gene index length =
-        match genomes.ContainsKey((species, gene)) with
+        match genes.ContainsKey((species, gene)) with
         | false -> ()
-        | true -> genomes.[(species, gene)].RemoveRange(index, length)
+        | true -> genes.[(species, gene)].RemoveRange(index, length)
         
     let duplicate species gene1 gene2 =
-        match genomes.ContainsKey((species, gene2)) with
+        match genes.ContainsKey((species, gene2)) with
         | false -> ()
-        | true -> genomes.Add((species, gene1), new List<Nucleobase>(genomes.[(species, gene2)]))
+        | true -> genes.Add((species, gene1), new List<Nucleobase>(genes.[(species, gene2)]))
      
     let loss species gene =
-        match genomes.ContainsKey((species, gene)) with
+        match genes.ContainsKey((species, gene)) with
         | false -> ()
-        | true -> genomes.Remove((species, gene)) |> ignore
+        | true -> genes.Remove((species, gene)) |> ignore
         
     let fission species gene1 gene2 index =
-        match genomes.ContainsKey((species, gene2)) with
+        match genes.ContainsKey((species, gene2)) with
         | false -> ()
         | true -> 
-            genomes.Add((species, gene1), new List<Nucleobase>(genomes.[species, gene2].
-                                GetRange(index, genomes.[species, gene2].Count - index)))
-            genomes.[(species, gene2)].RemoveRange(index, genomes.[species, gene2].Count - index)                
+            genes.Add((species, gene1), new List<Nucleobase>(genes.[species, gene2].
+                                GetRange(index, genes.[species, gene2].Count - index)))
+            genes.[(species, gene2)].RemoveRange(index, genes.[species, gene2].Count - index)                
             
     let fusion species gene1 gene2 =
-        match genomes.ContainsKey((species, gene1)) && 
-            genomes.ContainsKey((species, gene2)) with
+        match genes.ContainsKey((species, gene1)) && 
+            genes.ContainsKey((species, gene2)) with
         | false -> ()
         | true -> 
-            genomes.[(species, gene1)].AddRange(new List<Nucleobase>(genomes.[species, gene2]))
+            genes.[(species, gene1)].AddRange(new List<Nucleobase>(genes.[species, gene2]))
             loss species gene2
     
     let speciation species1 species2 =
-        let species = genomes |> Seq.filter (fun x -> (fst x.Key) = species2)
+        let species = genes |> Seq.filter (fun x -> (fst x.Key) = species2)
         match species |> Seq.isEmpty with
         | true -> ()
         | false ->
             species 
             |> Seq.toArray
-            |> Array.iter (fun x -> genomes.Add((species1, (snd x.Key)), new List<Nucleobase>(x.Value)))
+            |> Array.iter (fun x -> genes.Add((species1, (snd x.Key)), new List<Nucleobase>(x.Value)))
                 
     let events (event: string list) =
         match (event |> List.head) with
@@ -138,7 +138,7 @@ module IO =
         
     let writeLines filename =
         use file = IO.File.CreateText filename
-        genomes |> Seq.iter (fun x -> 
+        genes |> Seq.iter (fun x -> 
                         fprintfn file ">SE%d_G%d\n%s" 
                             (fst x.Key) (snd x.Key) (toString x.Value))
 

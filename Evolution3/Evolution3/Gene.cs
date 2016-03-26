@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace Evolution3 {
 
-    public class Genome {
+    public class Gene {
 
         private int speciesId;
         private int geneId;
         private DNA dna;
 
-        public Genome() {
+        public Gene() {
             this.speciesId = 0;
             this.geneId = 0;
             this.dna = null;
         }
 
-        public Genome(int speciesId, int geneId, DNA dna) {
+        public Gene(int speciesId, int geneId, DNA dna) {
             this.speciesId = speciesId;
             this.geneId = geneId;
             this.dna = dna;

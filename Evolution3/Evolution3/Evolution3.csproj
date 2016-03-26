@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DNA.cs" />
-    <Compile Include="Genome.cs" />
+    <Compile Include="Gene.cs" />
     <Compile Include="IO.cs" />
     <Compile Include="Nucleobase.cs" />
     <Compile Include="Program.cs" />

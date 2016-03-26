@@ -26,7 +26,8 @@ namespace Evolution3 {
         /// <summary>
         /// The class contructor with a DNA string.
         /// </summary>
-        /// <param name="dna">A DNA string</param>
+        /// <param name="dna">A string representing a sequence
+        /// of DNA</param>
         public DNA(string dna) {
             this.dna = new List<Nucleobases>(Nucleobase.ToDNA(dna));
         }

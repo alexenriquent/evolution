@@ -11,11 +11,17 @@ namespace Evolution3 {
     /// </summary>
     public class Gene {
 
-        /// <summary>A species ID</summary>
+        /// <summary>
+        /// The species ID associated with this gene object.
+        /// </summary>
         private int speciesId;
-        /// <summary>A gene ID</summary>
+        /// <summary>
+        /// The gene ID associated with this gene object.
+        /// </summary>
         private int geneId;
-        /// <summary>A DNA object</summary>
+        /// <summary>
+        /// The DNA associated with this gene object.
+        /// </summary>
         private DNA dna;
 
         /// <summary>
@@ -30,8 +36,8 @@ namespace Evolution3 {
         /// <summary>
         /// The class constructor with properties.
         /// </summary>
-        /// <param name="speciesId">A species ID</param>
-        /// <param name="geneId">A gene ID</param>
+        /// <param name="speciesId">An integer representing a species ID</param>
+        /// <param name="geneId">An integer representing a gene ID</param>
         /// <param name="dna">A DNA object</param>
         public Gene(int speciesId, int geneId, DNA dna) {
             this.speciesId = speciesId;

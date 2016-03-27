@@ -104,17 +104,26 @@ module Utilities =
         Int32.Parse str
 
 /// <summary>
-/// This module contains the evolution events.
+/// This module contains a dictionary of all
+/// genes in the world
 /// </summary>
-module Events =
-    
+module World =
+
     open DNA
-    open Utilities
 
     /// <summary>
     /// A dictionary containing genes.
     /// </summary>
     let genes = new SortedDictionary<int * int, List<Nucleobase>>()
+
+/// <summary>
+/// This module contains the evolution events.
+/// </summary>
+module Events =
+    
+    open DNA
+    open World
+    open Utilities
     
     /// <summary>
     /// Creates a new gene and adds it to the gene list.
@@ -257,6 +266,7 @@ module IO =
 
     open DNA
     open Events
+    open World
     
     /// <summary>
     /// Reads the input file and adds each line to a list

@@ -114,14 +114,20 @@
  <param name="gene">An integer representing a gene ID</param>
  <param name="dna">A string representing a sequence of DNA</param>
 </member>
-<member name="P:Program.Events.genes">
+<member name="T:Program.Events">
+ <summary>
+ This module contains the evolution events.
+ </summary>
+</member>
+<member name="P:Program.World.genes">
  <summary>
  A dictionary containing genes.
  </summary>
 </member>
-<member name="T:Program.Events">
+<member name="T:Program.World">
  <summary>
- This module contains the evolution events.
+ This module contains a dictionary of all
+ genes in the world
  </summary>
 </member>
 <member name="M:Program.Utilities.Int(System.String)">

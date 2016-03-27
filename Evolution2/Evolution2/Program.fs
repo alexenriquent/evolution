@@ -197,9 +197,10 @@ module Events =
         match genes.ContainsKey((species, gene2)) with
         | false -> ()
         | true -> 
-            genes.Add((species, gene1), new List<Nucleobase>(genes.[species, gene2].
-                                GetRange(index, genes.[species, gene2].Count - index)))
-            genes.[(species, gene2)].RemoveRange(index, genes.[species, gene2].Count - index)                
+            let length = genes.[species, gene2].Count - index
+            let newDNA = new List<Nucleobase>(genes.[species, gene2].GetRange(index, length))
+            genes.Add((species, gene1), newDNA)
+            genes.[(species, gene2)].RemoveRange(index, length)                
     
     /// <summary>
     /// Fuses two existing genes to create a new gene.
@@ -267,14 +268,6 @@ module IO =
         IO.File.ReadLines path
     
     /// <summary>
-    /// Splits each element in a line and adds it to a list.
-    /// </summary>
-    /// <param name="str">The input string to be split</param>
-    /// <returns>A list of split string</returns>
-    let split (str:string) =
-        str.Split [|','|] |> Array.toList
-    
-    /// <summary>
     /// Writes a list to file.
     /// </summary>
     /// <param name="filename">A file path/filename</param>
@@ -290,9 +283,9 @@ module IO =
 /// </summary>
 /// <param name="args">A list of command line arguments</param>
 let main argv = 
-    IO.readLines "Tests/test10" 
+    IO.readLines argv.[0] 
     |> Seq.toList
-    |> List.map IO.split
+    |> List.map (fun str -> str.Split [|','|] |> Array.toList)
     |> List.iter (Events.events)
 
     IO.writeLines "Results/test10.fa"

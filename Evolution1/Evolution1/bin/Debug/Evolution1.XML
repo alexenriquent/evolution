@@ -15,13 +15,6 @@
  <param name="filename">A file path/filename</param>
  <param name="map">A map containing all genes</param>
 </member>
-<member name="M:Program.IO.split(System.String)">
- <summary>
- Splits each element in a line and adds it to a list.
- </summary>
- <param name="str">The input string to be split</param>
- <returns>A list of split string</returns>
-</member>
 <member name="M:Program.IO.readLines(System.String)">
  <summary>
  Reads the input file and adds each line to a list
@@ -134,7 +127,7 @@
 </member>
 <member name="M:Program.Events.create``2(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}},``0,``1,System.String)">
  <summary>
- Creates a new gene and retursns a new map containing that gene.
+ Creates a new gene and returns a new map containing that gene.
  </summary>
  <param name="genes">A map containing all genes</param>
  <param name="species">An integer representing a species ID</param>
@@ -146,6 +139,23 @@
  <summary>
  This module contains the evolution events.
  </summary>
+</member>
+<member name="M:Program.Utilities.find``3(``0,``1)">
+ <summary>
+ Finds an element in the gene map.
+ </summary>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene">An integer representing a gene ID</param>
+ <returns>A map containing the specified element</returns>     
+</member>
+<member name="M:Program.Utilities.contains``3(``0,``1)">
+ <summary>
+ Checks if the gene map contains the specified key.
+ </summary>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene">An integer representing a gene ID</param>
+ <returns>True if the gene map contains the specified key,
+ false otherwise</returns>
 </member>
 <member name="M:Program.Utilities.split``1(System.Int32,System.Collections.Generic.IEnumerable{``0})">
  <summary>

@@ -16,7 +16,7 @@ namespace Evolution3 {
         /// </summary>
         /// <param name="args">A list of command line arguments</param>
         static void Main(string[] args) {
-            List<string[]> lines = IO.ReadLines("Tests/test10");
+            List<string[]> lines = IO.ReadLines(args[0]);
             foreach (string[] line in lines) {
                 World.Events(line);
             }

@@ -26,6 +26,7 @@
     <DocumentationFile>bin\Debug\Evolution2.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
     <StartWorkingDirectory>Z:\Repository\Evolution\Evolution2\Evolution2\</StartWorkingDirectory>
+    <StartArguments>Tests/test10</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

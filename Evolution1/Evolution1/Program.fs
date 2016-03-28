@@ -125,19 +125,6 @@ module Utilities =
         let fstPart = list |> Seq.take index |> Seq.toList
         let sndPart = list |> Seq.skip index |> Seq.toList
         (fstPart, sndPart)
-
-    /// <summary>
-    /// Checks if the specified element exists in the map.
-    /// </summary>
-    /// <param name="map">A map</param>
-    /// <param name="key1">An integer representing the first element 
-    /// in the key tuple<param>
-    /// <param name="key2">An integer representing the second element 
-    /// in the key tuple</param>
-    /// <returns>True if the specified element exists in the map,
-    /// false otherwise</returns>
-    let exists map key1 key2 =
-        map |> Map.containsKey (key1, key2)  
     
     /// <summary>
     /// Finds an element in the map.
@@ -296,6 +283,7 @@ module Events =
     /// <returns>True if the specified gene exists in the gene list,
     /// false otherwise</returns>
     let valid genes event =
+        let exists genes species gene = genes |> Map.containsKey (species, gene) 
         match event |> List.head with
         | "create" | "speciation" -> true
         | "duplicate" | "fission" -> exists genes (Int event.[1]) (Int event.[3])

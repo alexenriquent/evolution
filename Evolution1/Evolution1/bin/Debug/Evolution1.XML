@@ -160,18 +160,6 @@
  in the key tuple</param>
  <returns>A map containing the specified element</returns>     
 </member>
-<member name="M:Program.Utilities.exists``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},``2},``0,``1)">
- <summary>
- Checks if the specified element exists in the map.
- </summary>
- <param name="map">A map</param>
- <param name="key1">An integer representing the first element 
- in the key tuple<param>
- <param name="key2">An integer representing the second element 
- in the key tuple</param>
- <returns>True if the specified element exists in the map,
- false otherwise</returns>
-</member>
 <member name="M:Program.Utilities.split``1(System.Int32,System.Collections.Generic.IEnumerable{``0})">
  <summary>
  Splits a list and returns a tuple containing the first

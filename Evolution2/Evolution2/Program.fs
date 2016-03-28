@@ -107,8 +107,6 @@ module World =
 /// the evolution events.
 /// </summary>
 module Utilities =
-
-    open World
     
     /// <summary>
     /// Parses a string to an integer.

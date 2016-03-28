@@ -37,6 +37,16 @@
  <param name="action">An array containing events</param> 
  <returns>A new map containing all genes</returns>                  
 </member>
+<member name="M:Program.Events.valid``1(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},``0},Microsoft.FSharp.Collections.FSharpList{System.String})">
+ <summary>
+ Checks from the event if the specified gene exists 
+ in the gene list.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="event">A list containing an event</param>
+ <returns>True if the specified gene exists in the gene list,
+ false otherwise</returns>
+</member>
 <member name="M:Program.Events.speciation``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},``2},``0,``0)">
  <summary>
  Creates a new species from an existing species.
@@ -142,19 +152,24 @@
 </member>
 <member name="M:Program.Utilities.find``3(``0,``1)">
  <summary>
- Finds an element in the gene map.
+ Finds an element in the map.
  </summary>
- <param name="species">An integer representing a species ID</param>
- <param name="gene">An integer representing a gene ID</param>
+ <param name="key1">An integer representing the first element 
+ in the key tuple</param>
+ <param name="key2">An integer representing the second element 
+ in the key tuple</param>
  <returns>A map containing the specified element</returns>     
 </member>
 <member name="M:Program.Utilities.exists``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},``2},``0,``1)">
  <summary>
- Checks if the specified gene exists in the gene map.
+ Checks if the specified element exists in the map.
  </summary>
- <param name="species">An integer representing a species ID</param>
- <param name="gene">An integer representing a gene ID</param>
- <returns>True if the specified gene exists in the gene map,
+ <param name="map">A map</param>
+ <param name="key1">An integer representing the first element 
+ in the key tuple<param>
+ <param name="key2">An integer representing the second element 
+ in the key tuple</param>
+ <returns>True if the specified element exists in the map,
  false otherwise</returns>
 </member>
 <member name="M:Program.Utilities.split``1(System.Int32,System.Collections.Generic.IEnumerable{``0})">

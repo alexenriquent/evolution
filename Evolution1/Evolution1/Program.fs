@@ -127,24 +127,28 @@ module Utilities =
         (fstPart, sndPart)
 
     /// <summary>
-    /// Checks if the specified gene exists in the gene map.
+    /// Checks if the specified element exists in the map.
     /// </summary>
-    /// <param name="genes">A map containing all genes</param>
-    /// <param name="species">An integer representing a species ID</param>
-    /// <param name="gene">An integer representing a gene ID</param>
-    /// <returns>True if the specified gene exists in the gene map,
+    /// <param name="map">A map</param>
+    /// <param name="key1">An integer representing the first element 
+    /// in the key tuple<param>
+    /// <param name="key2">An integer representing the second element 
+    /// in the key tuple</param>
+    /// <returns>True if the specified element exists in the map,
     /// false otherwise</returns>
-    let exists genes species gene =
-        genes |> Map.containsKey (species, gene)  
+    let exists map key1 key2 =
+        map |> Map.containsKey (key1, key2)  
     
     /// <summary>
-    /// Finds an element in the gene map.
+    /// Finds an element in the map.
     /// </summary>
-    /// <param name="species">An integer representing a species ID</param>
-    /// <param name="gene">An integer representing a gene ID</param>
+    /// <param name="key1">An integer representing the first element 
+    /// in the key tuple</param>
+    /// <param name="key2">An integer representing the second element 
+    /// in the key tuple</param>
     /// <returns>A map containing the specified element</returns>     
-    let find species gene =
-        Map.find (species, gene) 
+    let find key1 key2 =
+        Map.find (key1, key2) 
 
 /// <summary>
 /// This module contains the evolution events.
@@ -281,7 +285,23 @@ module Events =
         match species |> Map.isEmpty with
         | true -> genes
         | false -> Map.fold (fun state key value -> 
-                            state |> Map.add (species1, snd key) value) genes species 
+                            state |> Map.add (species1, snd key) value) genes species    
+    
+    /// <summary>
+    /// Checks from the event if the specified gene exists 
+    /// in the gene list.
+    /// </summary>
+    /// <param name="genes">A map containing all genes</param>
+    /// <param name="event">A list containing an event</param>
+    /// <returns>True if the specified gene exists in the gene list,
+    /// false otherwise</returns>
+    let valid genes event =
+        match event |> List.head with
+        | "create" | "speciation" -> true
+        | "duplicate" | "fission" -> exists genes (Int event.[1]) (Int event.[3])
+        | "fusion" -> exists genes (Int event.[1]) (Int event.[2]) && 
+                      exists genes (Int event.[1]) (Int event.[3])
+        | _ -> exists genes (Int event.[1]) (Int event.[2])
      
     /// <summary>
     /// Different types of events which alter existing genes
@@ -291,24 +311,20 @@ module Events =
     /// <param name="action">An array containing events</param> 
     /// <returns>A new map containing all genes</returns>                  
     let events genes event =
-        match event |> List.head with
-        | "create" -> create genes (Int event.[1]) (Int event.[2]) event.[3]
-        | "snip" when exists genes (Int event.[1]) (Int event.[2]) ->
-            snip genes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
-        | "insert" when exists genes (Int event.[1]) (Int event.[2]) -> 
-            insert genes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
-        | "delete" when exists genes (Int event.[1]) (Int event.[2]) -> 
-            delete genes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "duplicate" when exists genes (Int event.[1]) (Int event.[3]) -> 
-            duplicate genes (Int event.[1]) (Int event.[2]) (Int event.[3])
-        | "loss" -> loss genes (Int event.[1]) (Int event.[2])
-        | "fission" when exists genes (Int event.[1]) (Int event.[3]) -> 
-            fission genes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "fusion" when exists genes (Int event.[1]) (Int event.[2]) && 
-            exists genes (Int event.[1]) (Int event.[3]) -> 
-            fusion genes (Int event.[1]) (Int event.[2]) (Int event.[3])
-        | "speciation" -> speciation genes (Int event.[1]) (Int event.[2])
-        | _ -> genes
+        match valid genes event with
+        | false -> genes
+        | true ->
+            match event |> List.head with
+            | "create" -> create genes (Int event.[1]) (Int event.[2]) event.[3]
+            | "snip" -> snip genes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
+            | "insert" -> insert genes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
+            | "delete" -> delete genes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+            | "duplicate" ->  duplicate genes (Int event.[1]) (Int event.[2]) (Int event.[3])
+            | "loss" -> loss genes (Int event.[1]) (Int event.[2])
+            | "fission" -> fission genes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+            | "fusion" -> fusion genes (Int event.[1]) (Int event.[2]) (Int event.[3])
+            | "speciation" -> speciation genes (Int event.[1]) (Int event.[2])
+            | _ -> genes
 
 /// <summary>
 /// This module contains the I/O operations.

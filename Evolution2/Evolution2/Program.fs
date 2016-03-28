@@ -117,16 +117,6 @@ module Utilities =
     /// <returns>An integer</returns>         
     let Int str =
         Int32.Parse str
-    
-    /// <summary>
-    /// Checks if the specified gene exists in the gene dictionary.
-    /// </summary>
-    /// <param name="species">An integer representing a species ID</param>
-    /// <param name="gene">An integer representing a gene ID</param>
-    /// <returns>True if the specified gene exists in the gene dictionary,
-    /// false otherwise</returns>
-    let exists species gene =
-        genes.ContainsKey((species, gene))
 
 /// <summary>
 /// This module contains the evolution events.
@@ -237,30 +227,41 @@ module Events =
             |> Array.iter (fun x -> genes.Add((species1, (snd x.Key)), new List<Nucleobase>(x.Value)))
     
     /// <summary>
+    /// Checks from the event if the specified gene exists 
+    /// in the gene dictionary.
+    /// </summary>
+    /// <param name="event">A list containing an event</param>
+    /// <returns>True if the specified gene exists in the gene dictionary,
+    /// false otherwise</returns>
+    let valid event =
+        let exists species gene = genes.ContainsKey((species, gene))
+        match event |> List.head with
+        | "create" | "speciation" -> true
+        | "duplicate" | "fission" -> exists (Int event.[1]) (Int event.[3])
+        | "fusion" -> exists (Int event.[1]) (Int event.[2]) && 
+                      exists (Int event.[1]) (Int event.[3])
+        | _ -> exists (Int event.[1]) (Int event.[2])
+
+    /// <summary>
     /// Different types of events which alter existing genes
     /// in various ways.
     /// </summary>
     /// <param name="action">An array containing events</param> 
     let events (event: string list) =
-        match (event |> List.head) with
-        | "create" -> create (Int event.[1]) (Int event.[2]) event.[3]
-        | "snip" when exists (Int event.[1]) (Int event.[2]) -> 
-            snip (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
-        | "insert" when exists (Int event.[1]) (Int event.[2]) -> 
-            insert (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
-        | "delete" when exists (Int event.[1]) (Int event.[2]) -> 
-            delete (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "duplicate" when exists (Int event.[1]) (Int event.[3]) -> 
-            duplicate (Int event.[1]) (Int event.[2]) (Int event.[3])
-        | "loss" when exists (Int event.[1]) (Int event.[2]) -> 
-            loss (Int event.[1]) (Int event.[2])
-        | "fission" when exists (Int event.[1]) (Int event.[3]) -> 
-            fission (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "fusion" when exists (Int event.[1]) (Int event.[2]) && 
-            exists (Int event.[1]) (Int event.[3]) -> 
-            fusion (Int event.[1]) (Int event.[2]) (Int event.[3])
-        | "speciation" -> speciation (Int event.[1]) (Int event.[2])
-        | _ -> ()
+        match valid event with
+        | false -> ()
+        | true ->
+            match event |> List.head with
+            | "create" -> create (Int event.[1]) (Int event.[2]) event.[3]
+            | "snip" -> snip (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
+            | "insert" -> insert (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
+            | "delete" -> delete (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+            | "duplicate" ->  duplicate (Int event.[1]) (Int event.[2]) (Int event.[3])
+            | "loss" -> loss (Int event.[1]) (Int event.[2])
+            | "fission" -> fission (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+            | "fusion" -> fusion (Int event.[1]) (Int event.[2]) (Int event.[3])
+            | "speciation" -> speciation (Int event.[1]) (Int event.[2])
+            | _ -> ()
 
 /// <summary>
 /// This module contains the I/O operations.

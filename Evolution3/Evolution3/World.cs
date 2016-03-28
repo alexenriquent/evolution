@@ -39,10 +39,8 @@ namespace Evolution3 {
         /// nucleobase to be replaced</param>
         /// <param name="dna">A string representing a single nucleobase</param>
         private static void Snip(int species, int gene, int index, string dna) {
-            if (GeneExists(species, gene)) {
-                int i = GeneIndex(species, gene);
-                genes[i].Dna.Dna[index] = Nucleobase.ToDNA(dna)[0];
-            }
+            int i = GeneIndex(species, gene);
+            genes[i].Dna.Dna[index] = Nucleobase.ToDNA(dna)[0];
         }
 
         /// <summary>
@@ -53,10 +51,8 @@ namespace Evolution3 {
         /// <param name="index">An integer representing the index to be inserted</param>
         /// <param name="dna">A string representing a sequence of DNA</param>
         private static void Insert(int species, int gene, int index, string dna) {
-            if (GeneExists(species, gene)) {
-                int i = GeneIndex(species, gene);
-                genes[i].Dna.Dna.InsertRange(index, Nucleobase.ToDNA(dna));
-            }
+            int i = GeneIndex(species, gene);
+            genes[i].Dna.Dna.InsertRange(index, Nucleobase.ToDNA(dna));
         }
 
         /// <summary>
@@ -67,10 +63,8 @@ namespace Evolution3 {
         /// <param name="index">An index to start the delete operation</param>
         /// <param name="length">Length of the section to be deleted</param>
         private static void Delete(int species, int gene, int index, int length) {
-            if (GeneExists(species, gene)) {
-                int i = GeneIndex(species, gene);
-                genes[i].Dna.Dna.RemoveRange(index, length);
-            }
+            int i = GeneIndex(species, gene);
+            genes[i].Dna.Dna.RemoveRange(index, length);
         }
 
         /// <summary>
@@ -81,11 +75,9 @@ namespace Evolution3 {
         /// <param name="gene1">An integer representing the gene to be added</param>
         /// <param name="gene2">An integer representing the gene to be copied</param>
         private static void Duplicate(int species, int gene1, int gene2) {
-            if (GeneExists(species, gene2)) {
-                int i = GeneIndex(species, gene2);
-                Gene gene = new Gene(species, gene1, new DNA(genes[i].Dna.Dna));
-                genes.Add(gene);
-            }
+            int i = GeneIndex(species, gene2);
+            Gene gene = new Gene(species, gene1, new DNA(genes[i].Dna.Dna));
+            genes.Add(gene);
         }
 
         /// <summary>
@@ -94,10 +86,8 @@ namespace Evolution3 {
         /// <param name="species">An integer representing a species ID</param>
         /// <param name="gene">An integer representing a gene ID</param>
         private static void Loss(int species, int gene) {
-            if (GeneExists(species, gene)) {
-                int i = GeneIndex(species, gene);
-                genes.RemoveAt(i);
-            }
+            int i = GeneIndex(species, gene);
+            genes.RemoveAt(i);
         }
 
         /// <summary>
@@ -108,14 +98,12 @@ namespace Evolution3 {
         /// <param name="gene2">An integer representing the gene to be split</param>
         /// <param name="index">An integer representing the spliting index</param>
         private static void Fission(int species, int gene1, int gene2, int index) {
-            if (GeneExists(species, gene2)) {
-                int i = GeneIndex(species, gene2);
-                Gene gene = new Gene(species, gene1, 
-                                new DNA(genes[i].Dna.Dna.GetRange
-                                (index, genes[i].Dna.Dna.Count - index)));
-                genes.Add(gene);
-                genes[i].Dna.Dna.RemoveRange(index, genes[i].Dna.Dna.Count - index);
-            }
+            int i = GeneIndex(species, gene2);
+            Gene gene = new Gene(species, gene1, 
+                        new DNA(genes[i].Dna.Dna.GetRange
+                        (index, genes[i].Dna.Dna.Count - index)));
+            genes.Add(gene);
+            genes[i].Dna.Dna.RemoveRange(index, genes[i].Dna.Dna.Count - index);
         }
 
         /// <summary>
@@ -125,12 +113,10 @@ namespace Evolution3 {
         /// <param name="gene1">An integer representing the gene to be fused</param>
         /// <param name="gene2">An integer representing the gene to be removed</param>
         private static void Fusion(int species, int gene1, int gene2) {
-            if (GeneExists(species, gene1) && GeneExists(species, gene2)) {
-                int i1 = GeneIndex(species, gene1);
-                int i2 = GeneIndex(species, gene2);
-                genes[i1].Dna.Dna.AddRange(new List<Nucleobases>(genes[i2].Dna.Dna));
-                Loss(species, gene2);
-            }
+            int i1 = GeneIndex(species, gene1);
+            int i2 = GeneIndex(species, gene2);
+            genes[i1].Dna.Dna.AddRange(new List<Nucleobases>(genes[i2].Dna.Dna));
+            Loss(species, gene2);
         }
 
         /// <summary>
@@ -155,16 +141,38 @@ namespace Evolution3 {
         /// </summary>
         /// <param name="action">An array containing events</param>
         public static void Events(string[] action) {
-            switch (action[0]) {
-                case "create": Create(Int(action[1]), Int(action[2]), action[3]); break;
-                case "snip": Snip(Int(action[1]), Int(action[2]), Int(action[3]), action[5]); break;
-                case "insert": Insert(Int(action[1]), Int(action[2]), Int(action[3]), action[4]); break;
-                case "delete": Delete(Int(action[1]), Int(action[2]), Int(action[3]), Int(action[4])); break;
-                case "duplicate": Duplicate(Int(action[1]), Int(action[2]), Int(action[3])); break;
-                case "loss": Loss(Int(action[1]), Int(action[2])); break;
-                case "fission": Fission(Int(action[1]), Int(action[2]), Int(action[3]), Int(action[4])); break;
-                case "fusion": Fusion(Int(action[1]), Int(action[2]), Int(action[3])); break;
-                case "speciation": Speciation(Int(action[1]), Int(action[2])); break;
+            if (Valid(action)) {
+                switch (action[0]) {
+                    case "create": Create(Int(action[1]), Int(action[2]), action[3]); break;
+                    case "snip": Snip(Int(action[1]), Int(action[2]), Int(action[3]), action[5]); break;
+                    case "insert": Insert(Int(action[1]), Int(action[2]), Int(action[3]), action[4]); break;
+                    case "delete": Delete(Int(action[1]), Int(action[2]), Int(action[3]), Int(action[4])); break;
+                    case "duplicate": Duplicate(Int(action[1]), Int(action[2]), Int(action[3])); break;
+                    case "loss": Loss(Int(action[1]), Int(action[2])); break;
+                    case "fission": Fission(Int(action[1]), Int(action[2]), Int(action[3]), Int(action[4])); break;
+                    case "fusion":  Fusion(Int(action[1]), Int(action[2]), Int(action[3])); break;
+                    case "speciation": Speciation(Int(action[1]), Int(action[2])); break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks from the event if the specified gene exists 
+        /// in the gene list.
+        /// </summary>
+        /// <param name="action">A string array containing an event</param>
+        /// <returns>True if the specified gene exists in the gene list,
+        /// false otherwise</returns>
+        private static bool Valid(string[] action) {
+            if (action[0] == "create" || action[0] == "speciation") {
+                return true;
+            } else if (action[0] == "duplicate" || action[0] == "fission") {
+                return GeneExists(Int(action[1]), Int(action[3]));
+            } else if (action[0] == "fusion") {
+                return GeneExists(Int(action[1]), Int(action[2])) &&
+                        GeneExists(Int(action[1]), Int(action[3]));
+            } else {
+                return GeneExists(Int(action[1]), Int(action[2]));
             }
         }
 
@@ -172,7 +180,7 @@ namespace Evolution3 {
         /// Parses a string to an integer.
         /// </summary>
         /// <param name="str">A string input</param>
-        /// <returns></returns>
+        /// <returns>An integer</returns>
         private static int Int(string str) {
             return Int32.Parse(str);
         }
@@ -183,18 +191,19 @@ namespace Evolution3 {
         /// </summary>
         /// <param name="species">An integer representing a species ID</param>
         /// <param name="gene">An integer representing agene ID</param>
-        /// <returns></returns>
+        /// <returns>The index of the specified gene</returns>
         private static int GeneIndex(int species, int gene) {
             return genes.FindIndex(x => x.SpeciesId == species && x.GeneId == gene);
         }
 
         /// <summary>
         /// Checks if a gene with a specified predicate
-        /// exist in the gene list.
+        /// exists in the gene list.
         /// </summary>
         /// <param name="species">An integer representing a species ID</param>
         /// <param name="gene">An integer representing a gene ID</param>
-        /// <returns></returns>
+        /// <returns>True if the specified gene exists in the gene list,
+        /// false otherwise</returns>
         private static bool GeneExists(int species, int gene) {
             return genes.Exists(x => x.SpeciesId == species && x.GeneId == gene);
         }

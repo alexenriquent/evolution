@@ -129,6 +129,7 @@ module Utilities =
     /// <summary>
     /// Checks if the specified gene exists in the gene map.
     /// </summary>
+    /// <param name="genes">A map containing all genes</param>
     /// <param name="species">An integer representing a species ID</param>
     /// <param name="gene">An integer representing a gene ID</param>
     /// <returns>True if the specified gene exists in the gene map,

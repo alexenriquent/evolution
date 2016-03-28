@@ -150,6 +150,17 @@
  This module contains the evolution events.
  </summary>
 </member>
+<member name="M:Program.Utilities.exists``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},``2},``0,``1)">
+ <summary>
+ Checks if an element exists in the map.
+ </summary>
+ <param name="key1">An integer representing the first element 
+ in the key tuple</param>
+ <param name="key2">An integer representing the second element 
+ in the key tuple</param>
+ <returns>True if the map contains the specified element,
+ false otherwise</returns> 
+</member>
 <member name="M:Program.Utilities.find``3(``0,``1)">
  <summary>
  Finds an element in the map.

@@ -148,13 +148,13 @@
  <param name="gene">An integer representing a gene ID</param>
  <returns>A map containing the specified element</returns>     
 </member>
-<member name="M:Program.Utilities.contains``3(``0,``1)">
+<member name="M:Program.Utilities.exists``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},``2},``0,``1)">
  <summary>
- Checks if the gene map contains the specified key.
+ Checks if the specified gene exists in the gene map.
  </summary>
  <param name="species">An integer representing a species ID</param>
  <param name="gene">An integer representing a gene ID</param>
- <returns>True if the gene map contains the specified key,
+ <returns>True if the specified gene exists in the gene map,
  false otherwise</returns>
 </member>
 <member name="M:Program.Utilities.split``1(System.Int32,System.Collections.Generic.IEnumerable{``0})">

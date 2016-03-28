@@ -127,14 +127,14 @@ module Utilities =
         (fstPart, sndPart)
 
     /// <summary>
-    /// Checks if the gene map contains the specified key.
+    /// Checks if the specified gene exists in the gene map.
     /// </summary>
     /// <param name="species">An integer representing a species ID</param>
     /// <param name="gene">An integer representing a gene ID</param>
-    /// <returns>True if the gene map contains the specified key,
+    /// <returns>True if the specified gene exists in the gene map,
     /// false otherwise</returns>
-    let contains species gene =
-         Map.containsKey (species, gene)   
+    let exists genes species gene =
+        genes |> Map.containsKey (species, gene)  
     
     /// <summary>
     /// Finds an element in the gene map.
@@ -177,14 +177,11 @@ module Events =
     /// <param name="dna">A string representing a single nucleobase</param>
     /// <returns>A new map containing all genes including the modified gene</returns>
     let snip genes species gene index dna =
-        match genes |> contains species gene with
-        | false -> genes
-        | true ->
-            let newBase = dna |> toDNA |> List.head
-            let newDNA = replace index newBase (genes |> find species gene)
-            genes 
-            |> Map.remove (species, gene) 
-            |> Map.add (species, gene) newDNA
+        let newBase = dna |> toDNA |> List.head
+        let newDNA = replace index newBase (genes |> find species gene)
+        genes 
+        |> Map.remove (species, gene) 
+        |> Map.add (species, gene) newDNA
     
     /// <summary>
     /// Inserts a new sequence of DNA to an existing gene.
@@ -196,13 +193,10 @@ module Events =
     /// <param name="dna">A string representing a sequence of DNA</param>
     /// <returns>A new map containing all genes including the modified gene</returns>
     let insert genes species gene index dna =
-        match genes |> contains species gene with
-        | false -> genes
-        | true ->
-            let newDNA = split index (genes |> find species gene)
-            genes   
-            |> Map.remove (species, gene) 
-            |> Map.add (species, gene) ((fst newDNA) @ (toDNA dna) @ (snd newDNA))
+        let newDNA = split index (genes |> find species gene)
+        genes   
+        |> Map.remove (species, gene) 
+        |> Map.add (species, gene) ((fst newDNA) @ (toDNA dna) @ (snd newDNA))
     
     /// <summary>
     /// Deletes a section of DNA from an existing gene.
@@ -214,13 +208,10 @@ module Events =
     /// <param name="length">Length of the section to be deleted</param>
     /// <returns>A new map containing all genes including the modified gene</returns>
     let delete genes species gene index length =
-        match genes |> contains species gene with
-        | false -> genes
-        | true ->
-            let newDNA = split index (genes |> find species gene)
-            genes 
-            |> Map.remove (species, gene) 
-            |> Map.add (species, gene) ((fst newDNA) @ (snd (split length (snd newDNA))))           
+        let newDNA = split index (genes |> find species gene)
+        genes 
+        |> Map.remove (species, gene) 
+        |> Map.add (species, gene) ((fst newDNA) @ (snd (split length (snd newDNA))))           
     
     /// <summary>
     /// Adds a new gene to an existing species that is an exact
@@ -232,9 +223,7 @@ module Events =
     /// <param name="gene2">An integer representing the gene to be copied</param>
     /// <returns>A new map containing all genes including the duplicated gene</returns>
     let duplicate genes species gene1 gene2 =
-        match genes |> contains species gene2 with
-        | false -> genes
-        | true -> genes |> Map.add (species, gene1) (genes |> find species gene2)
+        genes |> Map.add (species, gene1) (genes |> find species gene2)
     
     /// <summary>
     /// Removes an existing gene from an existing species.
@@ -256,14 +245,11 @@ module Events =
     /// <param name="index">An integer representing the spliting index</param> 
     /// <returns>A new map containing all genes including the split genes</returns>  
     let fission genes species gene1 gene2 index =
-        match genes |> contains species gene2 with
-        | false -> genes
-        | true ->
-            let newDNA = split index (genes |> find species gene2)
-            genes 
-            |> Map.remove (species, gene2) 
-            |> Map.add (species, gene2) (fst newDNA)
-            |> Map.add (species, gene1) (snd newDNA)
+        let newDNA = split index (genes |> find species gene2)
+        genes 
+        |> Map.remove (species, gene2) 
+        |> Map.add (species, gene2) (fst newDNA)
+        |> Map.add (species, gene1) (snd newDNA)
     
     /// <summary>
     /// Fuses two existing genes to create a new gene.
@@ -274,14 +260,11 @@ module Events =
     /// <param name="gene2">An integer representing the gene to be removed</param>
     /// <returns>A new map containing all genes including the fused gene</returns>            
     let fusion genes species gene1 gene2 =
-        match genes |> contains species gene1 && genes |> contains species gene2 with
-        | false -> genes
-        | true ->
-            let newDNA = (genes |> find species gene1) @ (genes |> find species gene2)
-            genes 
-            |> Map.remove (species, gene1) 
-            |> Map.remove (species, gene2)
-            |> Map.add (species, gene1) newDNA   
+        let newDNA = (genes |> find species gene1) @ (genes |> find species gene2)
+        genes 
+        |> Map.remove (species, gene1) 
+        |> Map.remove (species, gene2)
+        |> Map.add (species, gene1) newDNA   
     
     /// <summary>
     /// Creates a new species from an existing species.
@@ -297,7 +280,7 @@ module Events =
         match species |> Map.isEmpty with
         | true -> genes
         | false -> Map.fold (fun state key value -> 
-                            state |> Map.add (species1, snd key) value) genes species
+                            state |> Map.add (species1, snd key) value) genes species 
      
     /// <summary>
     /// Different types of events which alter existing genes
@@ -309,13 +292,20 @@ module Events =
     let events genes event =
         match event |> List.head with
         | "create" -> create genes (Int event.[1]) (Int event.[2]) event.[3]
-        | "snip" -> snip genes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
-        | "insert" -> insert genes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
-        | "delete" -> delete genes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "duplicate" -> duplicate genes (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "snip" when exists genes (Int event.[1]) (Int event.[2]) ->
+            snip genes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
+        | "insert" when exists genes (Int event.[1]) (Int event.[2]) -> 
+            insert genes (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
+        | "delete" when exists genes (Int event.[1]) (Int event.[2]) -> 
+            delete genes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "duplicate" when exists genes (Int event.[1]) (Int event.[3]) -> 
+            duplicate genes (Int event.[1]) (Int event.[2]) (Int event.[3])
         | "loss" -> loss genes (Int event.[1]) (Int event.[2])
-        | "fission" -> fission genes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "fusion" -> fusion genes (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "fission" when exists genes (Int event.[1]) (Int event.[3]) -> 
+            fission genes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "fusion" when exists genes (Int event.[1]) (Int event.[2]) && 
+            exists genes (Int event.[1]) (Int event.[3]) -> 
+            fusion genes (Int event.[1]) (Int event.[2]) (Int event.[3])
         | "speciation" -> speciation genes (Int event.[1]) (Int event.[2])
         | _ -> genes
 

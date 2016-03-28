@@ -90,20 +90,6 @@ module DNA =
         nucleobaseList
 
 /// <summary>
-/// This module contains the helper functions used in
-/// the evolution events.
-/// </summary>
-module Utilities =
-    
-    /// <summary>
-    /// Parses a string to an integer.
-    /// </summary>
-    /// <param name="str">A string</param>
-    /// <returns>An integer</returns>         
-    let Int str =
-        Int32.Parse str
-
-/// <summary>
 /// This module contains a dictionary of all
 /// genes in the world
 /// </summary>
@@ -115,6 +101,32 @@ module World =
     /// A dictionary containing genes.
     /// </summary>
     let genes = new SortedDictionary<int * int, List<Nucleobase>>()
+
+/// <summary>
+/// This module contains the helper functions used in
+/// the evolution events.
+/// </summary>
+module Utilities =
+
+    open World
+    
+    /// <summary>
+    /// Parses a string to an integer.
+    /// </summary>
+    /// <param name="str">A string</param>
+    /// <returns>An integer</returns>         
+    let Int str =
+        Int32.Parse str
+    
+    /// <summary>
+    /// Checks if the specified gene exists in the gene dictionary.
+    /// </summary>
+    /// <param name="species">An integer representing a species ID</param>
+    /// <param name="gene">An integer representing a gene ID</param>
+    /// <returns>True if the specified gene exists in the gene dictionary,
+    /// false otherwise</returns>
+    let exists species gene =
+        genes.ContainsKey((species, gene))
 
 /// <summary>
 /// This module contains the evolution events.
@@ -145,9 +157,7 @@ module Events =
     /// nucleobase to be replaced</param>
     /// <param name="dna">A string representing a single nucleobase</param>
     let snip species gene index dna =
-        match genes.ContainsKey((species, gene)) with
-        | false -> ()
-        | true -> genes.[(species, gene)].[index] <- (dna |> toDNA |> (fun x -> x.[0]))
+        genes.[(species, gene)].[index] <- (dna |> toDNA |> (fun x -> x.[0]))
     
     /// <summary>
     /// Inserts a new sequence of DNA to an existing gene.
@@ -157,9 +167,7 @@ module Events =
     /// <param name="index">An integer representing the index to be inserted</param>
     /// <param name="dna">A string representing a sequence of DNA</param>
     let insert species gene index dna =
-        match genes.ContainsKey((species, gene)) with
-        | false -> ()
-        | true -> genes.[(species, gene)].InsertRange(index, (toDNA dna))  
+        genes.[(species, gene)].InsertRange(index, (toDNA dna))  
     
     /// <summary>
     /// Deletes a section of DNA from an existing gene.
@@ -169,9 +177,7 @@ module Events =
     /// <param name="index">An index to start the delete operation</param>
     /// <param name="length">Length of the section to be deleted</param>
     let delete species gene index length =
-        match genes.ContainsKey((species, gene)) with
-        | false -> ()
-        | true -> genes.[(species, gene)].RemoveRange(index, length)
+        genes.[(species, gene)].RemoveRange(index, length)
     
     /// <summary>
     /// Adds a new gene to an existing species that is an exact
@@ -181,9 +187,7 @@ module Events =
     /// <param name="gene1">An integer representing the gene to be added</param>
     /// <param name="gene2">An integer representing the gene to be copied</param>
     let duplicate species gene1 gene2 =
-        match genes.ContainsKey((species, gene2)) with
-        | false -> ()
-        | true -> genes.Add((species, gene1), new List<Nucleobase>(genes.[(species, gene2)]))
+        genes.Add((species, gene1), new List<Nucleobase>(genes.[(species, gene2)]))
     
     /// <summary>
     /// Removes an existing gene from an existing species.
@@ -191,9 +195,7 @@ module Events =
     /// <param name="species">An integer representing a species ID</param>
     /// <param name="gene">An integer representing a gene ID</param>
     let loss species gene =
-        match genes.ContainsKey((species, gene)) with
-        | false -> ()
-        | true -> genes.Remove((species, gene)) |> ignore
+        genes.Remove((species, gene)) |> ignore
     
     /// <summary>
     /// Splits an existing gene into 2 genes.
@@ -203,13 +205,10 @@ module Events =
     /// <param name="gene2">An integer representing the gene to be split</param>
     /// <param name="index">An integer representing the spliting index</param>
     let fission species gene1 gene2 index =
-        match genes.ContainsKey((species, gene2)) with
-        | false -> ()
-        | true -> 
-            let length = genes.[species, gene2].Count - index
-            let newDNA = new List<Nucleobase>(genes.[species, gene2].GetRange(index, length))
-            genes.Add((species, gene1), newDNA)
-            genes.[(species, gene2)].RemoveRange(index, length)                
+        let length = genes.[species, gene2].Count - index
+        let newDNA = new List<Nucleobase>(genes.[species, gene2].GetRange(index, length))
+        genes.Add((species, gene1), newDNA)
+        genes.[(species, gene2)].RemoveRange(index, length)                
     
     /// <summary>
     /// Fuses two existing genes to create a new gene.
@@ -218,12 +217,8 @@ module Events =
     /// <param name="gene1">An integer representing the gene to be fused</param>
     /// <param name="gene2">An integer representing the gene to be removed</param>
     let fusion species gene1 gene2 =
-        match genes.ContainsKey((species, gene1)) && 
-            genes.ContainsKey((species, gene2)) with
-        | false -> ()
-        | true -> 
-            genes.[(species, gene1)].AddRange(new List<Nucleobase>(genes.[species, gene2]))
-            loss species gene2
+        genes.[(species, gene1)].AddRange(new List<Nucleobase>(genes.[species, gene2]))
+        loss species gene2
     
     /// <summary>
     /// Creates a new species from an existing species.
@@ -249,13 +244,21 @@ module Events =
     let events (event: string list) =
         match (event |> List.head) with
         | "create" -> create (Int event.[1]) (Int event.[2]) event.[3]
-        | "snip" -> snip (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
-        | "insert" -> insert (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
-        | "delete" -> delete (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "duplicate" -> duplicate (Int event.[1]) (Int event.[2]) (Int event.[3])
-        | "loss" -> loss (Int event.[1]) (Int event.[2])
-        | "fission" -> fission (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-        | "fusion" -> fusion (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "snip" when exists (Int event.[1]) (Int event.[2]) -> 
+            snip (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
+        | "insert" when exists (Int event.[1]) (Int event.[2]) -> 
+            insert (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
+        | "delete" when exists (Int event.[1]) (Int event.[2]) -> 
+            delete (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "duplicate" when exists (Int event.[1]) (Int event.[3]) -> 
+            duplicate (Int event.[1]) (Int event.[2]) (Int event.[3])
+        | "loss" when exists (Int event.[1]) (Int event.[2]) -> 
+            loss (Int event.[1]) (Int event.[2])
+        | "fission" when exists (Int event.[1]) (Int event.[3]) -> 
+            fission (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
+        | "fusion" when exists (Int event.[1]) (Int event.[2]) && 
+            exists (Int event.[1]) (Int event.[3]) -> 
+            fusion (Int event.[1]) (Int event.[2]) (Int event.[3])
         | "speciation" -> speciation (Int event.[1]) (Int event.[2])
         | _ -> ()
 

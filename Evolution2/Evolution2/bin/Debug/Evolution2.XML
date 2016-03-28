@@ -119,16 +119,14 @@
  This module contains the evolution events.
  </summary>
 </member>
-<member name="P:Program.World.genes">
+<member name="M:Program.Utilities.exists(System.Int32,System.Int32)">
  <summary>
- A dictionary containing genes.
+ Checks if the specified gene exists in the gene dictionary.
  </summary>
-</member>
-<member name="T:Program.World">
- <summary>
- This module contains a dictionary of all
- genes in the world
- </summary>
+ <param name="species">An integer representing a species ID</param>
+ <param name="gene">An integer representing a gene ID</param>
+ <returns>True if the specified gene exists in the gene dictionary,
+ false otherwise</returns>
 </member>
 <member name="M:Program.Utilities.Int(System.String)">
  <summary>
@@ -141,6 +139,17 @@
  <summary>
  This module contains the helper functions used in
  the evolution events.
+ </summary>
+</member>
+<member name="P:Program.World.genes">
+ <summary>
+ A dictionary containing genes.
+ </summary>
+</member>
+<member name="T:Program.World">
+ <summary>
+ This module contains a dictionary of all
+ genes in the world
  </summary>
 </member>
 <member name="T:Program.DNA.ParsedChar">

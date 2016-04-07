@@ -111,7 +111,10 @@ module DNA =
         list1 
         |> List.map (fun x -> list2 |> List.tryFind (fun y -> 
                     x.event = y.event && x.origin = y.origin && x.position = y.position))
-        |> List.fold (fun acc x -> if x <> None then x.Value :: acc else acc) []
+        |> List.fold (fun acc x -> 
+                    match x <> None with
+                    | true -> x.Value :: acc
+                    | false -> acc) []
         |> List.rev
 
 /// <summary>

@@ -8,7 +8,7 @@
  </summary>
  <param name="args">A list of command line arguments</param>
 </member>
-<member name="M:Program.IO.writeLines(System.String,Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}})">
+<member name="M:Program.IO.writeResults(System.String,Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide}})">
  <summary>
  Writes a list to file.
  </summary>
@@ -28,7 +28,7 @@
  This module contains the I/O operations.
  </summary>    
 </member>
-<member name="M:Program.Events.events(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}},Microsoft.FSharp.Collections.FSharpList{System.String})">
+<member name="M:Program.Events.events(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide}},Microsoft.FSharp.Collections.FSharpList{System.String})">
  <summary>
  Different types of events which alter existing genes
  in various ways.
@@ -110,7 +110,7 @@
  <param name="length">Length of the section to be deleted</param>
  <returns>A new map containing all genes including the modified gene</returns>
 </member>
-<member name="M:Program.Events.insert``2(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}},``0,``1,System.Int32,System.String)">
+<member name="M:Program.Events.insert(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide}},System.Int32,System.Int32,System.Int32,System.String)">
  <summary>
  Inserts a new sequence of DNA to an existing gene.
  </summary>
@@ -121,7 +121,7 @@
  <param name="dna">A string representing a sequence of DNA</param>
  <returns>A new map containing all genes including the modified gene</returns>
 </member>
-<member name="M:Program.Events.snip``2(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}},``0,``1,System.Int32,System.String)">
+<member name="M:Program.Events.snip``2(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide}},``0,``1,System.Int32,System.String)">
  <summary>
  A single nucleotide polymorphism (SNP).
  Replaces a single nucleobase (or nucleotide) within
@@ -135,7 +135,7 @@
  <param name="dna">A string representing a single nucleobase</param>
  <returns>A new map containing all genes including the modified gene</returns>
 </member>
-<member name="M:Program.Events.create``2(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase}},``0,``1,System.String)">
+<member name="M:Program.Events.create(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide}},System.Int32,System.Int32,System.String)">
  <summary>
  Creates a new gene and returns a new map containing that gene.
  </summary>

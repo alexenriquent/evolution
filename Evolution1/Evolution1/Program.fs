@@ -17,6 +17,8 @@ module DNA =
     /// A single case union type of nucleobases after being parsed.
     /// </summary>
     type ParsedChar = ValidBase of Nucleobase | InvalidBase of char
+    
+    type Nucleotide = { event: string; origin: int * int; position: int; nucleobase: Nucleobase }
       
     /// <summary>
     /// Parses a nucleobase to a character.
@@ -55,7 +57,7 @@ module DNA =
         | 'G' -> ValidBase G
         | 'T' -> ValidBase T
         | ib -> InvalidBase ib
-    
+
     /// <summary>
     /// Converts a string of nucleobases to a list.
     /// </summary>
@@ -82,6 +84,35 @@ module DNA =
             | InvalidBase ch -> 
                 None
             )
+
+    let rec updateIndex index nucleotides =
+        match nucleotides with 
+        | [] -> []
+        | head::tail ->
+            { event = head.event; 
+            origin = head.origin;
+            position = index;
+            nucleobase = head.nucleobase; } :: (updateIndex (index + 1) tail)
+        
+
+    let toNucleotides evt org pos dna =
+        dna
+        |> List.fold (fun acc x -> {event = evt; origin = org; position = pos; nucleobase = x;} :: acc) []
+        |> List.rev
+        |> updateIndex pos
+
+    let toDNAString nucleotides =
+        nucleotides 
+        |> List.fold (fun acc nucleotide -> nucleotide.nucleobase :: acc) []
+        |> List.rev
+        |> toString
+
+    let findCommon (list1: Nucleotide list) (list2: Nucleotide list) =
+        list1 
+        |> List.map (fun x -> list2 |> List.tryFind (fun y -> 
+                    x.event = y.event && x.origin = y.origin && x.position = y.position))
+        |> List.fold (fun acc x -> if x <> None then x.Value :: acc else acc) []
+        |> List.rev
 
 /// <summary>
 /// This module contains the helper functions used in
@@ -149,6 +180,22 @@ module Utilities =
     let exists map key1 key2 =
         map |> Map.containsKey (key1, key2)
 
+    let removeFirst list =
+        match list with 
+        | [] -> []
+        | [head] -> []
+        | head::tail -> tail
+
+    let removeDuplicates list = 
+        let remove item acc =
+            match acc with
+            | [] -> [item]
+            | _ ->
+                match List.exists (fun x -> x = item) acc with
+                | false -> item :: acc
+                | true -> acc
+        List.foldBack remove list [] 
+
 /// <summary>
 /// This module contains the evolution events.
 /// </summary>
@@ -166,7 +213,7 @@ module Events =
     /// <param name="dna">A string representing a sequence of DNA</param>
     /// <returns>A new map containing all genes including the newly created gene</returns>    
     let create genes species gene dna =
-        Map.add (species, gene) (toDNA dna) genes
+        Map.add (species, gene) (toNucleotides "create" (species, gene) 0 (toDNA dna)) genes
      
     /// <summary>
     /// A single nucleotide polymorphism (SNP).
@@ -181,11 +228,13 @@ module Events =
     /// <param name="dna">A string representing a single nucleobase</param>
     /// <returns>A new map containing all genes including the modified gene</returns>
     let snip genes species gene index dna =
-        let newBase = dna |> toDNA |> List.head
-        let newDNA = replace index newBase (genes |> find species gene)
+        let target = genes |> find species gene |> List.item index
+        let nucleobase = [dna |> toDNA |> List.head]
+        let nucleotide = toNucleotides target.event target.origin target.position nucleobase
+        let nucleotides = split index (genes |> find species gene) 
         genes 
         |> Map.remove (species, gene) 
-        |> Map.add (species, gene) newDNA
+        |> Map.add (species, gene) ((fst nucleotides) @ nucleotide @ (removeFirst (snd nucleotides)))
     
     /// <summary>
     /// Inserts a new sequence of DNA to an existing gene.
@@ -197,10 +246,11 @@ module Events =
     /// <param name="dna">A string representing a sequence of DNA</param>
     /// <returns>A new map containing all genes including the modified gene</returns>
     let insert genes species gene index dna =
-        let newDNA = split index (genes |> find species gene)
+        let nucleotides = split index (genes |> find species gene)
+        let newSection = toNucleotides "insert" (species, gene) index (toDNA dna)
         genes   
         |> Map.remove (species, gene) 
-        |> Map.add (species, gene) ((fst newDNA) @ (toDNA dna) @ (snd newDNA))
+        |> Map.add (species, gene) ((fst nucleotides) @ newSection @ (snd nucleotides))
     
     /// <summary>
     /// Deletes a section of DNA from an existing gene.
@@ -212,10 +262,10 @@ module Events =
     /// <param name="length">Length of the section to be deleted</param>
     /// <returns>A new map containing all genes including the modified gene</returns>
     let delete genes species gene index length =
-        let newDNA = split index (genes |> find species gene)
+        let nucleotides = split index (genes |> find species gene)
         genes 
         |> Map.remove (species, gene) 
-        |> Map.add (species, gene) ((fst newDNA) @ (snd (split length (snd newDNA))))           
+        |> Map.add (species, gene) ((fst nucleotides) @ (snd (split length (snd nucleotides))))           
     
     /// <summary>
     /// Adds a new gene to an existing species that is an exact
@@ -249,11 +299,11 @@ module Events =
     /// <param name="index">An integer representing the spliting index</param> 
     /// <returns>A new map containing all genes including the split genes</returns>  
     let fission genes species gene1 gene2 index =
-        let newDNA = split index (genes |> find species gene2)
+        let nucleotides = split index (genes |> find species gene2)
         genes 
         |> Map.remove (species, gene2) 
-        |> Map.add (species, gene2) (fst newDNA)
-        |> Map.add (species, gene1) (snd newDNA)
+        |> Map.add (species, gene2) (fst nucleotides)
+        |> Map.add (species, gene1) (snd nucleotides)
     
     /// <summary>
     /// Fuses two existing genes to create a new gene.
@@ -264,11 +314,11 @@ module Events =
     /// <param name="gene2">An integer representing the gene to be removed</param>
     /// <returns>A new map containing all genes including the fused gene</returns>            
     let fusion genes species gene1 gene2 =
-        let newDNA = (genes |> find species gene1) @ (genes |> find species gene2)
+        let nucleotides = (genes |> find species gene1) @ (genes |> find species gene2)
         genes 
         |> Map.remove (species, gene1) 
         |> Map.remove (species, gene2)
-        |> Map.add (species, gene1) newDNA   
+        |> Map.add (species, gene1) nucleotides   
     
     /// <summary>
     /// Creates a new species from an existing species.
@@ -323,14 +373,25 @@ module Events =
             | "fission" -> fission genes (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
             | "fusion" -> fusion genes (Int event.[1]) (Int event.[2]) (Int event.[3])
             | "speciation" -> speciation genes (Int event.[1]) (Int event.[2])
-            | _ -> genes
+            | _ -> genes 
 
+    let homologous genes gene =
+        genes |> Map.fold (fun state key value -> match ((findCommon value gene) |> List.length) = 0 with
+                                                    | true -> state
+                                                    | false -> key :: state) [] |> List.sort
+    let toHomolog genes =
+        genes
+        |> List.fold (fun acc (key1, key2) -> "SE" + (string key1) + "_G" + (string key2) :: acc) []
+        |> List.rev
+        |> String.concat " "
+ 
 /// <summary>
 /// This module contains the I/O operations.
 /// </summary>    
 module IO =
 
     open DNA
+    open Events
     
     /// <summary>
     /// Reads the input file and adds each line to a list
@@ -346,11 +407,17 @@ module IO =
     /// </summary>
     /// <param name="filename">A file path/filename</param>
     /// <param name="map">A map containing all genes</param>
-    let writeLines filename map =
+    let writeResults filename map =
         use file = IO.File.CreateText filename
         map |> Map.iter (fun key value -> 
                             fprintfn file ">SE%d_G%d\n%s" 
-                                (fst key) (snd key) (toString value))
+                                (fst key) (snd key) (toDNAString value))
+
+    let writeHomologousResults filename map =
+        use file = IO.File.CreateText filename
+        map |> Map.iter (fun key value -> 
+                            fprintfn file "SE%d_G%d: %s"
+                                (fst key) (snd key) (toHomolog value))
 
 [<EntryPoint>]
 /// <summary>
@@ -358,11 +425,13 @@ module IO =
 /// </summary>
 /// <param name="args">A list of command line arguments</param>
 let main argv = 
-    IO.readLines argv.[0] 
-    |> Seq.toList
-    |> List.map (fun str -> str.Split [|','|] |> Array.toList)
-    |> List.mapi (fun key value -> key, value)
-    |> Map.ofList
-    |> Map.fold (fun state key value -> Events.events state value) Map.empty
-    |> IO.writeLines "Results/test10.fa" 
+    let output = IO.readLines argv.[0] 
+                |> Seq.toList
+                |> List.map (fun str -> str.Split [|','|] |> Array.toList)
+                |> List.mapi (fun key value -> key, value)
+                |> Map.ofList
+                |> Map.fold (fun state key value -> Events.events state value) Map.empty
+    let homologous = output |> Map.fold (fun state key value -> Map.add key (Events.homologous output value) state) Map.empty
+    IO.writeResults "Results/test10.fa" output
+    IO.writeHomologousResults "Results/test10.homolog" homologous
     0 // return an integer exit code

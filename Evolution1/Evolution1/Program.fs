@@ -92,8 +92,7 @@ module DNA =
             { event = head.event; 
             origin = head.origin;
             position = index;
-            nucleobase = head.nucleobase; } :: (updateIndex (index + 1) tail)
-        
+            nucleobase = head.nucleobase; } :: (updateIndex (index + 1) tail)        
 
     let toNucleotides evt org pos dna =
         dna
@@ -107,9 +106,9 @@ module DNA =
         |> List.rev
         |> toString
 
-    let findCommon (list1: Nucleotide list) (list2: Nucleotide list) =
-        list1 
-        |> List.map (fun x -> list2 |> List.tryFind (fun y -> 
+    let findCommon (nucleotide1: Nucleotide list) (nucleotide2: Nucleotide list) =
+        nucleotide1 
+        |> List.map (fun x -> nucleotide2 |> List.tryFind (fun y -> 
                     x.event = y.event && x.origin = y.origin && x.position = y.position))
         |> List.fold (fun acc x -> 
                     match x <> None with
@@ -188,16 +187,6 @@ module Utilities =
         | [] -> []
         | [head] -> []
         | head::tail -> tail
-
-    let removeDuplicates list = 
-        let remove item acc =
-            match acc with
-            | [] -> [item]
-            | _ ->
-                match List.exists (fun x -> x = item) acc with
-                | false -> item :: acc
-                | true -> acc
-        List.foldBack remove list [] 
 
 /// <summary>
 /// This module contains the evolution events.

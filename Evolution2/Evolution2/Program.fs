@@ -18,6 +18,13 @@ module DNA =
     /// A single case union type of nucleobases after being parsed.
     /// </summary>
     type ParsedChar = ValidBase of Nucleobase | InvalidBase of char
+
+    type Nucleotide = {
+        event: string;
+        origin: int * int;
+        position: int;
+        mutable nucleobase: Nucleobase;
+        }
      
     /// <summary>
     /// Parses a nucleobase to a character.
@@ -76,7 +83,6 @@ module DNA =
     /// <param name="str">A string representing a sequence of DNA</param>
     /// <returns>A list containing a sequence of DNA</returns> 
     let toDNA str =
-        let nucleobaseList = new List<Nucleobase>()
         toNucleobaseList str
         |> List.choose(
             function
@@ -86,8 +92,52 @@ module DNA =
                 eprintfn "'%c' is invalid" ch
                 None
             )
-        |> List.iter (fun x -> nucleobaseList.Add(x))
-        nucleobaseList
+    
+    let rec updateIndex index nucleotides =
+        match nucleotides with 
+        | [] -> []
+        | head::tail ->
+            { event = head.event; 
+            origin = head.origin;
+            position = index;
+            nucleobase = head.nucleobase; } :: (updateIndex (index + 1) tail)
+
+    let newNucleotide evt org pos dna =
+        {event = evt; origin = org; position = pos; nucleobase = dna;}
+
+    let toNucleotideList nucleotides = 
+        let nucleotideList = new List<Nucleotide>()
+        nucleotides
+        |> Seq.iter (fun item -> nucleotideList.Add(item))
+        nucleotideList
+
+    let toNucleotides evt org pos dna =
+        dna
+        |> List.fold (fun acc item -> (newNucleotide evt org pos item) :: acc) []
+        |> List.rev
+        |> updateIndex pos
+        |> toNucleotideList
+    
+    let toDNAString nucleotides =
+        nucleotides
+        |> Seq.fold (fun acc nucleotide -> nucleotide.nucleobase :: acc) []
+        |> List.rev
+        |> toString   
+        
+    let copy nucleotides =
+        nucleotides
+        |> Seq.fold (fun acc x -> (newNucleotide x.event x.origin x.position x.nucleobase) :: acc) []
+        |> List.rev   
+        
+    let findCommon (nucleotides1: List<Nucleotide>) (nucleotides2: List<Nucleotide>) =
+        nucleotides1
+        |> Seq.map (fun x -> nucleotides2 |> Seq.tryFind (fun y ->
+                    x.event = y.event && x.origin = y.origin && x.position = y.position))
+        |> Seq.fold (fun acc x ->
+                    match x <> None with
+                    | true -> x.Value :: acc
+                    | false -> acc) []
+        |> List.rev 
 
 /// <summary>
 /// This module contains a dictionary of all
@@ -100,14 +150,16 @@ module World =
     /// <summary>
     /// A dictionary containing genes.
     /// </summary>
-    let genes = new SortedDictionary<int * int, List<Nucleobase>>()
+    let genes = new SortedDictionary<int * int, List<Nucleotide>>()
 
+    let homologousGenes = new SortedDictionary<int * int, (int * int) list>()
+    
 /// <summary>
 /// This module contains the helper functions used in
 /// the evolution events.
 /// </summary>
 module Utilities =
-    
+
     /// <summary>
     /// Parses a string to an integer.
     /// </summary>
@@ -132,7 +184,7 @@ module Events =
     /// <param name="gene">An integer representing a gene ID</param>
     /// <param name="dna">A string representing a sequence of DNA</param>
     let create species gene dna =
-        genes.Add((species, gene), toDNA dna)
+        genes.Add((species, gene), toNucleotides "create" (species, gene) 0 (toDNA dna))
     
     /// <summary>
     /// A single nucleotide polymorphism (SNP).
@@ -145,7 +197,7 @@ module Events =
     /// nucleobase to be replaced</param>
     /// <param name="dna">A string representing a single nucleobase</param>
     let snip species gene index dna =
-        genes.[(species, gene)].[index] <- (dna |> toDNA |> (fun x -> x.[0]))
+        genes.[(species, gene)].[index].nucleobase <- (dna |> toDNA |> (fun x -> x.[0]))
     
     /// <summary>
     /// Inserts a new sequence of DNA to an existing gene.
@@ -155,7 +207,7 @@ module Events =
     /// <param name="index">An integer representing the index to be inserted</param>
     /// <param name="dna">A string representing a sequence of DNA</param>
     let insert species gene index dna =
-        genes.[(species, gene)].InsertRange(index, (toDNA dna))  
+        genes.[(species, gene)].InsertRange(index, (toNucleotides "insert" (species, gene) index (toDNA dna)))  
     
     /// <summary>
     /// Deletes a section of DNA from an existing gene.
@@ -175,7 +227,7 @@ module Events =
     /// <param name="gene1">An integer representing the gene to be added</param>
     /// <param name="gene2">An integer representing the gene to be copied</param>
     let duplicate species gene1 gene2 =
-        genes.Add((species, gene1), new List<Nucleobase>(genes.[(species, gene2)]))
+        genes.Add((species, gene1), new List<Nucleotide>(copy genes.[(species, gene2)]))
     
     /// <summary>
     /// Removes an existing gene from an existing species.
@@ -194,7 +246,7 @@ module Events =
     /// <param name="index">An integer representing the spliting index</param>
     let fission species gene1 gene2 index =
         let length = genes.[species, gene2].Count - index
-        let newDNA = new List<Nucleobase>(genes.[species, gene2].GetRange(index, length))
+        let newDNA = new List<Nucleotide>(copy (genes.[species, gene2].GetRange(index, length)))
         genes.Add((species, gene1), newDNA)
         genes.[(species, gene2)].RemoveRange(index, length)                
     
@@ -205,7 +257,7 @@ module Events =
     /// <param name="gene1">An integer representing the gene to be fused</param>
     /// <param name="gene2">An integer representing the gene to be removed</param>
     let fusion species gene1 gene2 =
-        genes.[(species, gene1)].AddRange(new List<Nucleobase>(genes.[species, gene2]))
+        genes.[(species, gene1)].AddRange(new List<Nucleotide>(copy genes.[species, gene2]))
         loss species gene2
     
     /// <summary>
@@ -222,7 +274,7 @@ module Events =
         | false ->
             species 
             |> Seq.toArray
-            |> Array.iter (fun x -> genes.Add((species1, (snd x.Key)), new List<Nucleobase>(x.Value)))
+            |> Array.iter (fun x -> genes.Add((species1, (snd x.Key)), new List<Nucleotide>(copy x.Value)))
     
     /// <summary>
     /// Checks from the event if the specified gene exists 
@@ -254,12 +306,23 @@ module Events =
             | "snip" -> snip (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[5]
             | "insert" -> insert (Int event.[1]) (Int event.[2]) (Int event.[3]) event.[4]
             | "delete" -> delete (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
-            | "duplicate" ->  duplicate (Int event.[1]) (Int event.[2]) (Int event.[3])
+            | "duplicate" -> duplicate (Int event.[1]) (Int event.[2]) (Int event.[3])
             | "loss" -> loss (Int event.[1]) (Int event.[2])
             | "fission" -> fission (Int event.[1]) (Int event.[2]) (Int event.[3]) (Int event.[4])
             | "fusion" -> fusion (Int event.[1]) (Int event.[2]) (Int event.[3])
             | "speciation" -> speciation (Int event.[1]) (Int event.[2])
             | _ -> ()
+
+    let homologous gene =
+        genes |> Seq.fold (fun acc x -> match (findCommon x.Value gene) |> List.length = 0 with
+                                        | true -> acc
+                                        | false -> x.Key :: acc) [] |> List.sort
+
+    let toHomolog genes =
+        genes
+        |> List.fold (fun acc (key1, key2) -> "SE" + (string key1) + "_G" + (string key2) :: acc) []
+        |> List.rev
+        |> String.concat " "
 
 /// <summary>
 /// This module contains the I/O operations.
@@ -283,11 +346,17 @@ module IO =
     /// Writes a list to file.
     /// </summary>
     /// <param name="filename">A file path/filename</param>
-    let writeLines filename =
+    let writeResults filename =
         use file = IO.File.CreateText filename
         genes |> Seq.iter (fun x -> 
                         fprintfn file ">SE%d_G%d\n%s" 
-                            (fst x.Key) (snd x.Key) (toString x.Value))
+                            (fst x.Key) (snd x.Key) (toDNAString x.Value))
+
+    let writeHomologousResults filename =
+        use file = IO.File.CreateText filename
+        homologousGenes |> Seq.iter (fun x -> 
+                        fprintfn file "SE%d_G%d: %s" 
+                            (fst x.Key) (snd x.Key) (toHomolog x.Value))
 
 [<EntryPoint>]
 /// <summary>
@@ -299,6 +368,7 @@ let main argv =
     |> Seq.toList
     |> List.map (fun str -> str.Split [|','|] |> Array.toList)
     |> List.iter (Events.events)
-
-    IO.writeLines "Results/test10.fa"
+    World.genes |> Seq.iter (fun x -> World.homologousGenes.Add(x.Key, (Events.homologous x.Value)))
+    IO.writeResults "Results/test10.fa"
+    IO.writeHomologousResults "Results/test10.homolog"
     0 // return an integer exit code

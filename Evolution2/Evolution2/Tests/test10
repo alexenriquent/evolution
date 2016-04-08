@@ -453,7 +453,6 @@ snip,1,1,110,A,T
 snip,1,1,114,A,T
 delete,1,1,105,1
 fusion,1,1,17
-loss,1,17
 loss,2,20
 snip,2,7,11,T,G
 snip,2,7,15,A,G
@@ -554,7 +553,6 @@ delete,2,5,306,2
 insert,2,5,198,G
 insert,2,5,265,C
 fusion,2,16,5
-loss,2,5
 loss,2,16
 snip,2,18,8,A,C
 snip,2,18,21,G,C
@@ -689,7 +687,6 @@ snip,1,13,292,T,C
 insert,1,13,137,TAAC
 insert,1,13,18,CACGTGGCAGCC
 fusion,1,14,13
-loss,1,13
 snip,2,26,29,C,A
 snip,2,26,98,A,C
 snip,2,26,133,T,G
@@ -727,7 +724,6 @@ snip,2,24,69,G,C
 snip,2,24,73,T,A
 snip,2,24,74,T,C
 fusion,2,7,24
-loss,2,24
 snip,2,29,8,A,C
 snip,2,29,38,A,C
 snip,2,29,47,C,G
@@ -1309,7 +1305,6 @@ snip,2,25,20,C,T
 snip,2,25,31,G,T
 snip,2,25,42,T,G
 fusion,2,10,25
-loss,2,25
 snip,2,30,5,T,A
 snip,2,30,6,C,G
 snip,2,30,8,G,T
@@ -1563,7 +1558,6 @@ snip,3,39,5,C,A
 snip,3,40,24,T,G
 snip,3,29,121,A,T
 fusion,3,29,40
-loss,3,40
 snip,3,29,34,T,A
 duplicate,3,42,29
 loss,1,32
@@ -2020,7 +2014,6 @@ snip,4,45,245,C,G
 snip,4,45,265,T,A
 insert,4,45,0,G
 fusion,4,10,45
-loss,4,45
 snip,6,29,62,T,C
 snip,6,29,95,T,A
 snip,6,29,117,C,G
@@ -2156,7 +2149,6 @@ snip,1,50,351,C,A
 snip,1,50,390,A,C
 snip,1,50,394,T,A
 fusion,1,52,50
-loss,1,50
 snip,5,44,1,A,T
 snip,5,44,30,C,G
 snip,5,44,46,G,C
@@ -2218,7 +2210,6 @@ snip,2,39,20,C,A
 snip,2,39,21,C,G
 snip,2,39,26,G,C
 fusion,2,1,39
-loss,2,39
 snip,5,42,40,C,A
 snip,5,42,60,G,A
 snip,5,42,83,C,A
@@ -2282,7 +2273,6 @@ delete,6,41,25,5
 duplicate,6,64,41
 duplicate,6,65,1
 fusion,6,41,64
-loss,6,64
 snip,6,23,34,A,G
 snip,6,23,40,G,T
 snip,6,23,47,A,T
@@ -2359,7 +2349,6 @@ snip,4,29,171,A,T
 snip,4,29,187,A,G
 snip,4,29,203,G,T
 fusion,4,10,29
-loss,4,29
 snip,5,10,11,C,G
 snip,5,10,18,A,C
 snip,5,10,46,T,A
@@ -2515,7 +2504,6 @@ snip,3,49,199,T,G
 snip,3,49,204,G,C
 delete,3,49,70,1
 fusion,3,10,49
-loss,3,49
 snip,5,56,28,A,T
 snip,5,56,37,A,C
 snip,5,56,51,A,T
@@ -2534,7 +2522,6 @@ snip,5,44,133,A,T
 snip,5,44,158,C,T
 snip,5,44,168,C,G
 fusion,5,56,44
-loss,5,44
 snip,3,10,21,C,A
 snip,3,10,98,G,A
 snip,3,10,108,T,A
@@ -2557,7 +2544,6 @@ snip,4,23,9,G,A
 snip,4,23,11,G,T
 snip,4,23,52,A,T
 fusion,4,39,23
-loss,4,23
 snip,3,62,26,G,A
 snip,3,62,27,A,C
 snip,3,41,3,A,G
@@ -2574,7 +2560,6 @@ snip,3,41,44,G,T
 snip,3,41,47,A,T
 snip,3,41,51,C,G
 fusion,3,62,41
-loss,3,41
 snip,2,8,9,T,C
 snip,2,8,14,C,G
 snip,2,8,20,G,T
@@ -2936,7 +2921,6 @@ delete,6,10,408,1
 delete,6,10,170,1
 insert,6,10,273,AG
 fusion,6,41,10
-loss,6,10
 loss,1,38
 loss,4,39
 loss,6,29
@@ -3059,7 +3043,6 @@ snip,6,66,17,G,A
 snip,6,66,24,T,G
 snip,6,66,32,A,C
 fusion,6,55,66
-loss,6,66
 loss,6,55
 snip,5,56,9,A,C
 snip,5,56,51,T,C
@@ -3139,7 +3122,6 @@ delete,2,40,31,2
 duplicate,2,89,40
 snip,6,57,50,G,A
 fusion,6,57,84
-loss,6,84
 snip,1,67,8,T,C
 duplicate,1,90,67
 loss,5,56
@@ -3371,7 +3353,6 @@ loss,3,102
 loss,6,97
 snip,1,90,9,T,A
 fusion,1,67,90
-loss,1,90
 loss,4,69
 loss,2,41
 snip,4,75,7,A,G
@@ -3517,7 +3498,6 @@ snip,3,8,451,T,A
 snip,3,8,526,C,T
 snip,3,8,549,A,C
 fusion,3,48,8
-loss,3,8
 snip,5,58,0,T,A
 snip,5,58,1,A,T
 snip,5,58,12,T,A
@@ -3615,7 +3595,6 @@ snip,2,29,159,G,C
 snip,2,29,167,T,C
 delete,2,29,42,1
 fusion,2,8,29
-loss,2,29
 snip,4,75,24,T,A
 snip,4,75,28,A,C
 snip,4,75,73,C,G
@@ -3623,7 +3602,6 @@ snip,4,75,81,A,T
 snip,4,75,103,T,C
 snip,4,103,47,C,G
 fusion,4,75,103
-loss,4,103
 snip,4,10,13,A,C
 snip,4,10,24,A,T
 snip,4,10,37,A,T
@@ -3744,7 +3722,6 @@ snip,3,42,84,A,G
 snip,3,42,122,T,G
 snip,3,42,135,G,C
 fusion,3,81,42
-loss,3,42
 loss,1,67
 snip,1,4,3,A,C
 snip,1,4,21,A,G
@@ -3884,7 +3861,6 @@ snip,3,105,184,G,T
 snip,3,82,14,A,C
 snip,3,82,57,A,T
 fusion,3,105,82
-loss,3,82
 speciation,7,5
 snip,7,47,0,C,A
 snip,7,47,5,A,T
@@ -4051,7 +4027,6 @@ snip,5,86,405,T,G
 insert,5,86,53,C
 insert,5,86,33,A
 fusion,5,107,86
-loss,5,86
 snip,5,94,52,T,A
 snip,5,94,76,C,A
 snip,5,94,90,G,T
@@ -4086,7 +4061,6 @@ snip,5,68,412,A,T
 snip,5,68,414,C,T
 delete,5,68,56,4
 fusion,5,94,68
-loss,5,68
 snip,4,92,8,G,A
 snip,4,92,12,G,T
 snip,4,92,13,A,T
@@ -4190,7 +4164,6 @@ snip,7,86,283,G,C
 snip,7,86,330,T,A
 delete,7,86,225,2
 fusion,7,107,86
-loss,7,86
 loss,7,68
 snip,2,23,1,G,T
 snip,2,23,2,A,G
@@ -4289,7 +4262,6 @@ snip,1,14,285,T,G
 delete,1,14,269,2
 delete,1,14,9,19
 fusion,1,22,14
-loss,1,14
 loss,3,48
 snip,4,41,0,G,T
 snip,4,41,6,A,G
@@ -4324,7 +4296,6 @@ snip,2,93,30,A,C
 snip,2,93,39,T,A
 snip,2,93,49,C,G
 fusion,2,87,93
-loss,2,93
 loss,1,1
 snip,3,96,2,T,G
 snip,3,96,18,C,A
@@ -4345,7 +4316,6 @@ delete,2,89,28,2
 snip,2,87,31,G,T
 snip,2,87,91,C,A
 fusion,2,89,87
-loss,2,87
 snip,2,23,31,A,C
 snip,2,23,37,T,G
 snip,2,8,37,A,C
@@ -4398,7 +4368,6 @@ snip,2,8,703,A,C
 snip,2,8,725,C,G
 delete,2,8,611,2
 fusion,2,23,8
-loss,2,8
 loss,4,75
 snip,2,40,15,T,G
 snip,2,40,26,G,T
@@ -4467,7 +4436,6 @@ snip,4,123,654,T,A
 insert,4,123,442,C
 delete,4,123,343,6
 fusion,4,85,123
-loss,4,123
 snip,5,108,11,G,C
 snip,5,108,39,T,C
 snip,5,108,41,A,C
@@ -4683,7 +4651,6 @@ delete,3,1,19,3
 snip,3,96,0,A,T
 snip,3,96,45,A,C
 fusion,3,1,96
-loss,3,96
 snip,4,139,92,A,T
 snip,4,139,122,T,A
 duplicate,4,141,139
@@ -4979,7 +4946,6 @@ snip,6,1,22,C,G
 snip,6,125,11,A,C
 snip,6,125,24,C,A
 fusion,6,1,125
-loss,6,125
 duplicate,9,146,109
 loss,7,122
 snip,3,95,4,T,G
@@ -5119,7 +5085,6 @@ snip,8,109,15,G,A
 snip,8,109,19,T,C
 snip,8,109,37,C,G
 fusion,8,141,109
-loss,8,109
 snip,1,117,0,A,C
 snip,1,117,1,A,T
 snip,1,117,9,A,T
@@ -5197,7 +5162,6 @@ snip,9,141,59,T,A
 snip,9,141,98,A,T
 snip,9,141,112,A,C
 fusion,9,85,141
-loss,9,141
 loss,2,158
 loss,1,152
 snip,7,77,4,A,T
@@ -5218,7 +5182,6 @@ duplicate,3,162,115
 loss,7,58
 snip,5,154,6,C,T
 fusion,5,47,154
-loss,5,154
 loss,7,155
 snip,8,160,4,C,T
 snip,8,160,15,T,A
@@ -5272,7 +5235,6 @@ snip,3,101,119,G,C
 insert,3,101,107,A
 insert,3,101,67,TCAAG
 fusion,3,106,101
-loss,3,101
 duplicate,2,164,40
 loss,3,130
 loss,6,65
@@ -5390,7 +5352,6 @@ delete,5,107,386,2
 delete,5,107,438,2
 delete,5,107,237,1
 fusion,5,47,107
-loss,5,107
 loss,2,40
 snip,8,160,23,T,G
 snip,8,160,33,G,T
@@ -5398,7 +5359,6 @@ snip,8,160,49,G,C
 snip,8,163,0,C,T
 snip,8,163,21,A,C
 fusion,8,160,163
-loss,8,163
 loss,5,165
 loss,5,47
 loss,4,85
@@ -5423,7 +5383,6 @@ snip,3,132,27,T,A
 snip,3,132,28,T,G
 snip,3,132,31,A,T
 fusion,3,98,132
-loss,3,132
 loss,3,98
 snip,9,146,4,A,G
 snip,9,146,5,T,C
@@ -5496,13 +5455,11 @@ delete,9,113,354,1
 delete,9,113,271,1
 delete,9,113,569,1
 fusion,9,146,113
-loss,9,113
 loss,7,126
 snip,6,1,51,A,T
 snip,6,166,18,T,G
 snip,6,166,37,T,A
 fusion,6,1,166
-loss,6,166
 snip,1,120,1,A,T
 snip,1,120,5,T,G
 snip,1,120,11,A,G

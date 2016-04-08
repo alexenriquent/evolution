@@ -8,7 +8,7 @@
  </summary>
  <param name="args">A list of command line arguments</param>
 </member>
-<member name="M:Program.IO.writeLines(System.String)">
+<member name="M:Program.IO.writeResults(System.String)">
  <summary>
  Writes a list to file.
  </summary>

@@ -18,6 +18,9 @@ namespace Evolution3 {
         /// </summary>
         public static List<Gene> genes = new List<Gene>();
 
+        /// <summary>
+        /// A sorted dictionary containing the results of homologous genes
+        /// </summary>
         public static SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>> homologousGenes = 
                   new SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>>();
 
@@ -181,6 +184,9 @@ namespace Evolution3 {
             }
         }
 
+        /// <summary>
+        /// Tracks homologous genes of each gene in the gene list.
+        /// </summary>
         public static void Homologous() {
             foreach (Gene gene1 in genes) {
                 Tuple<int, int> key = new Tuple<int, int>(gene1.SpeciesId, gene1.GeneId);
@@ -194,6 +200,12 @@ namespace Evolution3 {
             }
         }
 
+        /// <summary>
+        /// Determines whether two genes are homologous.
+        /// </summary>
+        /// <param name="gene1">The gene object to be compared</param>
+        /// <param name="gene2">Another gene object to be compared</param>
+        /// <returns></returns>
         private static bool GeneCommon(Gene gene1, Gene gene2) {
             foreach (Nucleotide nucleotide1 in gene1.Dna.Dna) {
                 foreach (Nucleotide nucleotide2 in gene2.Dna.Dna) {
@@ -256,6 +268,10 @@ namespace Evolution3 {
             return geneList;
         }
 
+        /// <summary>
+        /// Sorts and formats the homologous gene dictionary.
+        /// </summary>
+        /// <returns></returns>
         public static List<string> HomologousGenes() {
             List<string> geneList = new List<string>();
             foreach (var gene in homologousGenes) {

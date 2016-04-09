@@ -24,10 +24,11 @@ namespace Evolution3 {
         }
 
         /// <summary>
-        /// The class contructor with a DNA string.
+        /// The class contructor given a DNA string.
         /// </summary>
-        /// <param name="dna">A string representing a sequence
-        /// of DNA</param>
+        /// <param name="action">A string representing an event</param>
+        /// <param name="origin">A tuple representing a gene origin</param>
+        /// <param name="dna">A string representing a sequence of DNA</param>
         public DNA(string action, Tuple<int, int> origin, string dna) {
             this.dna = new List<Nucleotide>();
             List<Nucleobases> nucleobases = Nucleobase.ToDNA(dna);
@@ -36,6 +37,10 @@ namespace Evolution3 {
             }
         }
 
+        /// <summary>
+        /// The class contructor given a nucletide list.
+        /// </summary>
+        /// <param name="dna">A nucleotide list</param>
         public DNA(List<Nucleotide> dna) {
             this.dna = new List<Nucleotide>();
             for (int i = 0; i < dna.Count; i++) {
@@ -61,6 +66,14 @@ namespace Evolution3 {
             set { this.dna[index] = value; }
         }
 
+        /// <summary>
+        /// Constructs a section of DNA sequence
+        /// </summary>
+        /// <param name="action">A string representing an event</param>
+        /// <param name="origin">A tuple representing a gene origin</param>
+        /// <param name="position">An integer representing a gene position</param>
+        /// <param name="dna">A string representing a sequence of DNA</param>
+        /// <returns></returns>
         public static List<Nucleotide> ToNucleotides(string action, Tuple<int, int> origin, int position, string dna) {
             List<Nucleotide> nucleotides = new List<Nucleotide>();
             List<Nucleobases> nucleobases = Nucleobase.ToDNA(dna);

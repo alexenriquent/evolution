@@ -19,7 +19,7 @@ namespace Evolution3 {
         public static List<Gene> genes = new List<Gene>();
 
         /// <summary>
-        /// A sorted dictionary containing the results of homologous genes
+        /// A sorted dictionary containing the homologous gene tracking results.
         /// </summary>
         public static SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>> homologousGenes = 
                   new SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>>();

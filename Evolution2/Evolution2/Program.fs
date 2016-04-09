@@ -93,6 +93,12 @@ module DNA =
                 None
             )
     
+    /// <summary>
+    /// Updates each nucleotide's position starting from
+    /// the given index.
+    /// </summary>
+    /// <param name="index">The starting index</param>
+    /// <returns>A list of nucleotides with updated positions</returns> 
     let rec updateIndex index nucleotides =
         match nucleotides with 
         | [] -> []
@@ -102,15 +108,36 @@ module DNA =
             position = index;
             nucleobase = head.nucleobase; } :: (updateIndex (index + 1) tail)
 
+    /// <summary>
+    /// Construct a nucleotide record.
+    /// </summary>
+    /// <param name="evt">A string representing an event</param>
+    /// <param name="org">A tuple representing an origin</param>
+    /// <param name="pos">An integer representing a position</param>
+    /// <param name="dna">A nucleobase</param>
+    /// <returns>A new necleotide record</returns>
     let newNucleotide evt org pos dna =
         {event = evt; origin = org; position = pos; nucleobase = dna;}
 
+    /// <summary>
+    /// Transfer a sequence of nucleotides to a list of nucleotides.
+    /// </summary>
+    /// <param name="nucleotides">A sequence of nucleotides</param>
+    /// <returns>A list of nucleotides</returns>
     let toNucleotideList nucleotides = 
         let nucleotideList = new List<Nucleotide>()
         nucleotides
         |> Seq.iter (fun item -> nucleotideList.Add(item))
         nucleotideList
 
+    /// <summary>
+    /// Construct a list of nucleotides.
+    /// </summary>
+    /// <param name="evt">A string representing an event</param>
+    /// <param name="org">A tuple representing an origin</param>
+    /// <param name="pos">An integer representing a position</param>
+    /// <param name="dna">A nucleobase</param>
+    /// <returns>A list of necleotides</returns>
     let toNucleotides evt org pos dna =
         dna
         |> List.fold (fun acc item -> (newNucleotide evt org pos item) :: acc) []
@@ -118,17 +145,33 @@ module DNA =
         |> updateIndex pos
         |> toNucleotideList
     
+    /// <summary>
+    /// Converts a list of nucleotides to a string.
+    /// </summary>
+    /// <param name="nucleotides">A sequence of nucleotides</param>
+    /// <returns>A string representing a sequence of nucleotides</returns>
     let toDNAString nucleotides =
         nucleotides
         |> Seq.fold (fun acc nucleotide -> nucleotide.nucleobase :: acc) []
         |> List.rev
         |> toString   
-        
+     
+    /// <summary>
+    /// Copies a sequence of nucleotides.
+    /// </summary>
+    /// <param name="nucleotides">A sequence of nucleotides</param>
+    /// <returns>A new sequence of nucleotides</returns>   
     let copy nucleotides =
         nucleotides
         |> Seq.fold (fun acc x -> (newNucleotide x.event x.origin x.position x.nucleobase) :: acc) []
         |> List.rev   
-        
+    
+    /// <summary>
+    /// Finds common elements between two sequences of nucleotides.
+    /// </summary>
+    /// <param name="nucleotide1">A sequence of nucleotides</param>
+    /// <param name="nucleotide2">A sequence of nucleotides</param>
+    /// <returns>A list of common nucleotides</returns>  
     let findCommon (nucleotides1: List<Nucleotide>) (nucleotides2: List<Nucleotide>) =
         nucleotides1
         |> Seq.map (fun x -> nucleotides2 |> Seq.tryFind (fun y ->
@@ -152,6 +195,9 @@ module World =
     /// </summary>
     let genes = new SortedDictionary<int * int, List<Nucleotide>>()
 
+    /// <summary>
+    /// A dictionary containing the homologous gene tracking results.
+    /// </summary>
     let homologousGenes = new SortedDictionary<int * int, (int * int) list>()
     
 /// <summary>
@@ -312,12 +358,22 @@ module Events =
             | "fusion" -> fusion (Int event.[1]) (Int event.[2]) (Int event.[3])
             | "speciation" -> speciation (Int event.[1]) (Int event.[2])
             | _ -> ()
-
+    
+    /// <summary>
+    /// Tracks homologous genes.
+    /// </summary>
+    /// <param name="gene">The sequence of nucleotides to be compared</param>
+    /// <returns>A list of homologous genes</returns> 
     let homologous gene =
         genes |> Seq.fold (fun acc x -> match (findCommon x.Value gene) |> List.length = 0 with
                                         | true -> acc
                                         | false -> x.Key :: acc) [] |> List.sort
-
+    
+    /// <summary>
+    /// Formats the homologous gene tracking results.
+    /// </summary>
+    /// <param name="genes">The result list</param>
+    /// <returns>A list of homologous genes</returns> 
     let toHomolog genes =
         genes
         |> List.fold (fun acc (key1, key2) -> "SE" + (string key1) + "_G" + (string key2) :: acc) []
@@ -343,7 +399,7 @@ module IO =
         IO.File.ReadLines path
     
     /// <summary>
-    /// Writes a list to file.
+    /// Writes the evolution results to file.
     /// </summary>
     /// <param name="filename">A file path/filename</param>
     let writeResults filename =
@@ -352,6 +408,10 @@ module IO =
                         fprintfn file ">SE%d_G%d\n%s" 
                             (fst x.Key) (snd x.Key) (toDNAString x.Value))
 
+    /// <summary>
+    /// Writes the homologous gene tracking results to file.
+    /// </summary>
+    /// <param name="filename">A file path/filename</param>
     let writeHomologousResults filename =
         use file = IO.File.CreateText filename
         homologousGenes |> Seq.iter (fun x -> 

@@ -14,13 +14,13 @@ namespace Evolution3 {
         /// <summary>
         /// A list of nucleobases.
         /// </summary>
-        private List<Nucleobases> dna;
+        private List<Nucleotide> dna;
 
         /// <summary>
         /// The DNA class default constructor.
         /// </summary>
         public DNA() {
-            this.dna = new List<Nucleobases>();
+            this.dna = new List<Nucleotide>();
         }
 
         /// <summary>
@@ -28,22 +28,25 @@ namespace Evolution3 {
         /// </summary>
         /// <param name="dna">A string representing a sequence
         /// of DNA</param>
-        public DNA(string dna) {
-            this.dna = new List<Nucleobases>(Nucleobase.ToDNA(dna));
+        public DNA(string action, Tuple<int, int> origin, string dna) {
+            this.dna = new List<Nucleotide>();
+            List<Nucleobases> nucleobases = Nucleobase.ToDNA(dna);
+            for (int i = 0; i < nucleobases.Count; i++) {
+                this.dna.Add(new Nucleotide(action, origin, i, nucleobases[i]));
+            }
         }
 
-        /// <summary>
-        /// The class constructor with a DNA list.
-        /// </summary>
-        /// <param name="dna">A list of DNA</param>
-        public DNA(List<Nucleobases> dna) {
-            this.dna = new List<Nucleobases>(dna);
+        public DNA(List<Nucleotide> dna) {
+            this.dna = new List<Nucleotide>();
+            for (int i = 0; i < dna.Count; i++) {
+                this.dna.Add(new Nucleotide(dna[i].Action, dna[i].Origin, dna[i].Position, dna[i].Nucleobase));
+            }
         }
 
         /// <summary>
         /// Accessor and mutator for this DNA.
         /// </summary>
-        public List<Nucleobases> Dna {
+        public List<Nucleotide> Dna {
             get { return this.dna; }
             set { this.dna = value; }
         }
@@ -53,11 +56,19 @@ namespace Evolution3 {
         /// with an index to access or modify a single 
         /// nucleobase.
         /// </summary>
-        public Nucleobases this[int index] {
+        public Nucleotide this[int index] {
             get { return this.dna[index]; }
             set { this.dna[index] = value; }
         }
 
+        public static List<Nucleotide> ToNucleotides(string action, Tuple<int, int> origin, int position, string dna) {
+            List<Nucleotide> nucleotides = new List<Nucleotide>();
+            List<Nucleobases> nucleobases = Nucleobase.ToDNA(dna);
+            for (int i = 0; i < nucleobases.Count; i++) {
+                nucleotides.Add(new Nucleotide(action, origin, position + i, nucleobases[i]));
+            }
+            return nucleotides;
+        }
 
         /// <summary>
         /// Converts a list of nucleobases to a string.
@@ -65,8 +76,8 @@ namespace Evolution3 {
         /// <returns>A string containing nucleobases</returns>
         public override string ToString() {
             string dnaStr = "";
-            foreach (Nucleobases nucleobase in this.dna) {
-                switch (nucleobase) {
+            foreach (Nucleotide nucleotide in this.dna) {
+                switch (nucleotide.Nucleobase) {
                     case Nucleobases.A: dnaStr += 'A'; break;
                     case Nucleobases.C: dnaStr += 'C'; break;
                     case Nucleobases.T: dnaStr += 'T'; break;

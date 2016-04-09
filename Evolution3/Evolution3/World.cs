@@ -18,6 +18,9 @@ namespace Evolution3 {
         /// </summary>
         public static List<Gene> genes = new List<Gene>();
 
+        public static SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>> homologousGenes = 
+                  new SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>>();
+
         /// <summary>
         /// Creates a new gene and adds it to the gene list.
         /// </summary>
@@ -25,7 +28,8 @@ namespace Evolution3 {
         /// <param name="gene">An integer representing a gene ID</param>
         /// <param name="dna">A string representing a sequence of DNA</param>
         private static void Create(int species, int gene, string dna) {
-            genes.Add(new Gene(species, gene, new DNA(dna)));
+            genes.Add(new Gene(species, gene, 
+                      new DNA("create", new Tuple<int, int>(species, gene), dna)));
         }
 
         /// <summary>
@@ -40,7 +44,7 @@ namespace Evolution3 {
         /// <param name="dna">A string representing a single nucleobase</param>
         private static void Snip(int species, int gene, int index, string dna) {
             int i = GeneIndex(species, gene);
-            genes[i].Dna.Dna[index] = Nucleobase.ToDNA(dna)[0];
+            genes[i].Dna.Dna[index].Nucleobase = Nucleobase.ToDNA(dna)[0];
         }
 
         /// <summary>
@@ -52,7 +56,8 @@ namespace Evolution3 {
         /// <param name="dna">A string representing a sequence of DNA</param>
         private static void Insert(int species, int gene, int index, string dna) {
             int i = GeneIndex(species, gene);
-            genes[i].Dna.Dna.InsertRange(index, Nucleobase.ToDNA(dna));
+            genes[i].Dna.Dna.InsertRange(index, 
+            DNA.ToNucleotides("insert", new Tuple<int, int>(species, gene), index, dna));
         }
 
         /// <summary>
@@ -115,7 +120,7 @@ namespace Evolution3 {
         private static void Fusion(int species, int gene1, int gene2) {
             int i1 = GeneIndex(species, gene1);
             int i2 = GeneIndex(species, gene2);
-            genes[i1].Dna.Dna.AddRange(new List<Nucleobases>(genes[i2].Dna.Dna));
+            genes[i1].Dna.Dna.AddRange(new List<Nucleotide>(genes[i2].Dna.Dna));
             Loss(species, gene2);
         }
 
@@ -176,6 +181,32 @@ namespace Evolution3 {
             }
         }
 
+        public static void Homologous() {
+            foreach (Gene gene1 in genes) {
+                Tuple<int, int> key = new Tuple<int, int>(gene1.SpeciesId, gene1.GeneId);
+                homologousGenes.Add(key, new List<Tuple<int, int>>());
+                foreach (Gene gene2 in genes) {
+                    if (GeneCommon(gene1, gene2)) {
+                        Tuple<int, int> value = new Tuple<int, int>(gene2.SpeciesId, gene2.GeneId);
+                        homologousGenes[key].Add(value);
+                    }
+                }
+            }
+        }
+
+        private static bool GeneCommon(Gene gene1, Gene gene2) {
+            foreach (Nucleotide nucleotide1 in gene1.Dna.Dna) {
+                foreach (Nucleotide nucleotide2 in gene2.Dna.Dna) {
+                    if (nucleotide1.Action == nucleotide2.Action &&
+                        nucleotide1.Origin == nucleotide2.Origin &&
+                        nucleotide1.Position == nucleotide2.Position) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// Parses a string to an integer.
         /// </summary>
@@ -218,9 +249,26 @@ namespace Evolution3 {
             List<string> geneList = new List<string>();
             foreach (Gene gene in sortedGenes) {
                 string geneStr = ">SE" + gene.SpeciesId + 
-                                    "_G" + gene.GeneId + 
-                                    "\n" + gene.Dna;
+                                 "_G" + gene.GeneId + 
+                                 "\n" + gene.Dna;
                 geneList.Add(geneStr); 
+            }
+            return geneList;
+        }
+
+        public static List<string> HomologousGenes() {
+            List<string> geneList = new List<string>();
+            foreach (var gene in homologousGenes) {
+                string geneStr = "SE" + gene.Key.Item1 +
+                                 "_G" + gene.Key.Item2 + ": ";
+                List<Tuple<int, int>> sortedGenes = gene.Value.OrderBy(x => x.Item1).
+                                                    ThenBy(x => x.Item2).ToList();
+                foreach (var nucleotide in sortedGenes) {
+                    geneStr += "SE" + nucleotide.Item1 +
+                               "_G" + nucleotide.Item2 + " ";
+                }
+                geneStr = geneStr.Remove(geneStr.Length - 1);
+                geneList.Add(geneStr);
             }
             return geneList;
         }

@@ -20,7 +20,9 @@ namespace Evolution3 {
             foreach (string[] line in lines) {
                 World.Events(line);
             }
+            World.Homologous();
             IO.WriteLines("Results/test10.fa", World.Genes());
+            IO.WriteLines("Results/test10.homolog", World.HomologousGenes());
         }
     }
 }

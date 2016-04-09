@@ -85,6 +85,12 @@ module DNA =
                 None
             )
 
+    /// <summary>
+    /// Updates each nucleotide's position starting from
+    /// the given index.
+    /// </summary>
+    /// <param name="index">The starting index</param>
+    /// <returns>A list of nucleotides with updated positions</returns> 
     let rec updateIndex index nucleotides =
         match nucleotides with 
         | [] -> []
@@ -92,20 +98,37 @@ module DNA =
             { event = head.event; 
             origin = head.origin;
             position = index;
-            nucleobase = head.nucleobase; } :: (updateIndex (index + 1) tail)        
-
+            nucleobase = head.nucleobase; } :: (updateIndex (index + 1) tail)  
+                  
+    /// <summary>
+    /// Construct a list of nucleotides.
+    /// </summary>
+    /// <param name="evt">A string representing an event</param>
+    /// <param name="org">A tuple representing an origin</param>
+    /// <param name="pos">An integer representing a position</param>
+    /// <param name="dna">A nucleobase</param>
+    /// <returns>A list of necleotides</returns>
     let toNucleotides evt org pos dna =
         dna
         |> List.fold (fun acc x -> {event = evt; origin = org; position = pos; nucleobase = x;} :: acc) []
         |> List.rev
         |> updateIndex pos
-
+    
+    /// <summary>
+    /// Converts a list of nucleotides to a string.
+    /// </summary>
+    /// <param name="nucleotides">A sequence of nucleotides</param>
+    /// <returns>A string representing a sequence of nucleotides</returns>
     let toDNAString nucleotides =
         nucleotides 
         |> List.fold (fun acc nucleotide -> nucleotide.nucleobase :: acc) []
         |> List.rev
         |> toString
-
+    /// <summary>
+    /// Copies a sequence of nucleotides.
+    /// </summary>
+    /// <param name="nucleotides">A sequence of nucleotides</param>
+    /// <returns>A new sequence of nucleotides</returns>  
     let findCommon (nucleotide1: Nucleotide list) (nucleotide2: Nucleotide list) =
         nucleotide1 
         |> List.map (fun x -> nucleotide2 |> List.tryFind (fun y -> 
@@ -170,7 +193,7 @@ module Utilities =
     let find key1 key2 =
         Map.find (key1, key2) 
     
-     /// <summary>
+    /// <summary>
     /// Checks if an element exists in the map.
     /// </summary>
     /// <param name="key1">An integer representing the first element 
@@ -181,7 +204,12 @@ module Utilities =
     /// false otherwise</returns> 
     let exists map key1 key2 =
         map |> Map.containsKey (key1, key2)
-
+    
+    /// <summary>
+    /// Remove the first element of the list.
+    /// </summary>
+    /// <param name="list">A list</param>
+    /// <returns>A new list with the first element removed</returns>  
     let removeFirst list =
         match list with 
         | [] -> []
@@ -366,11 +394,23 @@ module Events =
             | "fusion" -> fusion genes (Int event.[1]) (Int event.[2]) (Int event.[3])
             | "speciation" -> speciation genes (Int event.[1]) (Int event.[2])
             | _ -> genes 
-
+    
+    /// <summary>
+    /// Tracks homologous genes.
+    /// </summary>
+    /// <param name="genes">A map containing all genes</param>
+    /// <param name="gene">The sequence of nucleotides to be compared</param>
+    /// <returns>A list of homologous genes</returns> 
     let homologous genes gene =
         genes |> Map.fold (fun state key value -> match ((findCommon value gene) |> List.length) = 0 with
                                                     | true -> state
                                                     | false -> key :: state) [] |> List.sort
+   
+    /// <summary>
+    /// Formats the homologous gene tracking results.
+    /// </summary>
+    /// <param name="genes">The result list</param>
+    /// <returns>A list of homologous genes</returns> 
     let toHomolog genes =
         genes
         |> List.fold (fun acc (key1, key2) -> "SE" + (string key1) + "_G" + (string key2) :: acc) []
@@ -395,7 +435,7 @@ module IO =
         IO.File.ReadLines path
     
     /// <summary>
-    /// Writes a list to file.
+    /// Writes the results to file.
     /// </summary>
     /// <param name="filename">A file path/filename</param>
     /// <param name="map">A map containing all genes</param>
@@ -404,7 +444,13 @@ module IO =
         map |> Map.iter (fun key value -> 
                             fprintfn file ">SE%d_G%d\n%s" 
                                 (fst key) (snd key) (toDNAString value))
-
+    
+    /// <summary>
+    /// Writes the homologous gene tracking results to file.
+    /// </summary>
+    /// <param name="filename">A file path/filename</param>
+    /// <param name="map">A map containing the homologous gene 
+    /// tracking results</param>
     let writeHomologousResults filename map =
         use file = IO.File.CreateText filename
         map |> Map.iter (fun key value -> 

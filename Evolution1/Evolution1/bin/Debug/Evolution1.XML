@@ -8,9 +8,17 @@
  </summary>
  <param name="args">A list of command line arguments</param>
 </member>
+<member name="M:Program.IO.writeHomologousResults(System.String,Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{System.Tuple{System.Int32,System.Int32}}})">
+ <summary>
+ Writes the homologous gene tracking results to file.
+ </summary>
+ <param name="filename">A file path/filename</param>
+ <param name="map">A map containing the homologous gene 
+ tracking results</param>
+</member>
 <member name="M:Program.IO.writeResults(System.String,Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide}})">
  <summary>
- Writes a list to file.
+ Writes the results to file.
  </summary>
  <param name="filename">A file path/filename</param>
  <param name="map">A map containing all genes</param>
@@ -27,6 +35,21 @@
  <summary>
  This module contains the I/O operations.
  </summary>    
+</member>
+<member name="M:Program.Events.toHomolog(Microsoft.FSharp.Collections.FSharpList{System.Tuple{System.Int32,System.Int32}})">
+ <summary>
+ Formats the homologous gene tracking results.
+ </summary>
+ <param name="genes">The result list</param>
+ <returns>A list of homologous genes</returns> 
+</member>
+<member name="M:Program.Events.homologous``1(Microsoft.FSharp.Collections.FSharpMap{``0,Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide}},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide})">
+ <summary>
+ Tracks homologous genes.
+ </summary>
+ <param name="genes">A map containing all genes</param>
+ <param name="gene">The sequence of nucleotides to be compared</param>
+ <returns>A list of homologous genes</returns> 
 </member>
 <member name="M:Program.Events.events(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{System.Int32,System.Int32},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide}},Microsoft.FSharp.Collections.FSharpList{System.String})">
  <summary>
@@ -150,6 +173,13 @@
  This module contains the evolution events.
  </summary>
 </member>
+<member name="M:Program.Utilities.removeFirst``1(Microsoft.FSharp.Collections.FSharpList{``0})">
+ <summary>
+ Remove the first element of the list.
+ </summary>
+ <param name="list">A list</param>
+ <returns>A new list with the first element removed</returns>  
+</member>
 <member name="M:Program.Utilities.exists``3(Microsoft.FSharp.Collections.FSharpMap{System.Tuple{``0,``1},``2},``0,``1)">
  <summary>
  Checks if an element exists in the map.
@@ -218,6 +248,38 @@
  A nucleobase is not just any character, therefore it has
  to be from a limited set.
  </summary>
+</member>
+<member name="M:Program.DNA.findCommon(Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide},Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide})">
+ <summary>
+ Copies a sequence of nucleotides.
+ </summary>
+ <param name="nucleotides">A sequence of nucleotides</param>
+ <returns>A new sequence of nucleotides</returns>  
+</member>
+<member name="M:Program.DNA.toDNAString(Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide})">
+ <summary>
+ Converts a list of nucleotides to a string.
+ </summary>
+ <param name="nucleotides">A sequence of nucleotides</param>
+ <returns>A string representing a sequence of nucleotides</returns>
+</member>
+<member name="M:Program.DNA.toNucleotides(System.String,System.Int32,System.Int32,System.Int32,Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleobase})">
+ <summary>
+ Construct a list of nucleotides.
+ </summary>
+ <param name="evt">A string representing an event</param>
+ <param name="org">A tuple representing an origin</param>
+ <param name="pos">An integer representing a position</param>
+ <param name="dna">A nucleobase</param>
+ <returns>A list of necleotides</returns>
+</member>
+<member name="M:Program.DNA.updateIndex(System.Int32,Microsoft.FSharp.Collections.FSharpList{Program.DNA.Nucleotide})">
+ <summary>
+ Updates each nucleotide's position starting from
+ the given index.
+ </summary>
+ <param name="index">The starting index</param>
+ <returns>A list of nucleotides with updated positions</returns> 
 </member>
 <member name="M:Program.DNA.toDNA(System.String)">
  <summary>

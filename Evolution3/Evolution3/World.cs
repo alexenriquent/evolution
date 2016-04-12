@@ -16,13 +16,12 @@ namespace Evolution3 {
         /// <summary>
         /// A list containing genes.
         /// </summary>
-        public static List<Gene> genes = new List<Gene>();
+        public static List<Gene> genes;
 
         /// <summary>
         /// A sorted dictionary containing the homologous gene tracking results.
         /// </summary>
-        public static SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>> homologousGenes = 
-                  new SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>>();
+        public static SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>> homologousGenes;
 
         /// <summary>
         /// Creates a new gene and adds it to the gene list.

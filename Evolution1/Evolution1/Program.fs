@@ -440,10 +440,13 @@ module IO =
     /// <param name="filename">A file path/filename</param>
     /// <param name="map">A map containing all genes</param>
     let writeResults filename map =
-        use file = IO.File.CreateText filename
-        map |> Map.iter (fun key value -> 
-                            fprintfn file ">SE%d_G%d\n%s" 
-                                (fst key) (snd key) (toDNAString value))
+        let results = map |> Map.fold (fun state key value -> 
+                            ">SE" + (string (fst key)) + 
+                            "_G" + (string (snd key)) + 
+                            "\n" + (toDNAString value) :: state) []
+                          |> List.rev
+                          |> String.concat "\n"
+        IO.File.WriteAllText(filename, results + "\n")
     
     /// <summary>
     /// Writes the homologous gene tracking results to file.
@@ -452,10 +455,13 @@ module IO =
     /// <param name="map">A map containing the homologous gene 
     /// tracking results</param>
     let writeHomologousResults filename map =
-        use file = IO.File.CreateText filename
-        map |> Map.iter (fun key value -> 
-                            fprintfn file "SE%d_G%d: %s"
-                                (fst key) (snd key) (toHomolog value))
+        let results = map |> Map.fold (fun state key value -> 
+                            "SE" + (string (fst key)) + 
+                            "_G" + (string (snd key)) + 
+                            ": " + (toHomolog value) :: state) []
+                          |> List.rev
+                          |> String.concat "\n"
+        IO.File.WriteAllText(filename, results + "\n")
 
 [<EntryPoint>]
 /// <summary>
@@ -470,6 +476,6 @@ let main argv =
                 |> Map.ofList
                 |> Map.fold (fun state key value -> Events.events state value) Map.empty
     let homologous = output |> Map.fold (fun state key value -> Map.add key (Events.homologous output value) state) Map.empty
-    IO.writeResults "Results/test10.fa" output
-    IO.writeHomologousResults "Results/test10.homolog" homologous
+    IO.writeResults (argv.[0] + ".fa") output
+    IO.writeHomologousResults (argv.[0] + ".homologs") homologous
     0 // return an integer exit code

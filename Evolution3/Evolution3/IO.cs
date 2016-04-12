@@ -32,7 +32,11 @@ namespace Evolution3 {
         /// <param name="filename">A file path/filename</param>
         /// <param name="strList">A list of string</param>
         public static void WriteLines(string filename, List<string> strList) {
-            System.IO.File.WriteAllLines(filename, strList);
+            string results = "";
+            foreach (string line in strList) {
+                results += line + "\n";
+            }
+            System.IO.File.WriteAllText(filename, results);
         }
     }
 }

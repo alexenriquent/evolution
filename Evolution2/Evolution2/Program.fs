@@ -193,12 +193,12 @@ module World =
     /// <summary>
     /// A dictionary containing genes.
     /// </summary>
-    let genes = new SortedDictionary<int * int, List<Nucleotide>>()
+    let mutable genes = Unchecked.defaultof<SortedDictionary<int * int, List<Nucleotide>>>
 
     /// <summary>
     /// A dictionary containing the homologous gene tracking results.
     /// </summary>
-    let homologousGenes = new SortedDictionary<int * int, (int * int) list>()
+    let mutable homologousGenes = Unchecked.defaultof<SortedDictionary<int * int, (int * int) list>>
     
 /// <summary>
 /// This module contains the helper functions used in
@@ -403,20 +403,26 @@ module IO =
     /// </summary>
     /// <param name="filename">A file path/filename</param>
     let writeResults filename =
-        use file = IO.File.CreateText filename
-        genes |> Seq.iter (fun x -> 
-                        fprintfn file ">SE%d_G%d\n%s" 
-                            (fst x.Key) (snd x.Key) (toDNAString x.Value))
+        let results = genes |> Seq.fold (fun acc x -> 
+                            ">SE" + (string (fst x.Key)) + 
+                            "_G" + (string (snd x.Key)) + 
+                            "\n" + (toDNAString x.Value) :: acc) []
+                          |> List.rev
+                          |> String.concat "\n"
+        IO.File.WriteAllText(filename, results + "\n")
 
     /// <summary>
     /// Writes the homologous gene tracking results to file.
     /// </summary>
     /// <param name="filename">A file path/filename</param>
     let writeHomologousResults filename =
-        use file = IO.File.CreateText filename
-        homologousGenes |> Seq.iter (fun x -> 
-                        fprintfn file "SE%d_G%d: %s" 
-                            (fst x.Key) (snd x.Key) (toHomolog x.Value))
+        let results = homologousGenes |> Seq.fold (fun acc x -> 
+                            "SE" + (string (fst x.Key)) + 
+                            "_G" + (string (snd x.Key)) + 
+                            ": " + (toHomolog x.Value) :: acc) []
+                          |> List.rev
+                          |> String.concat "\n"
+        IO.File.WriteAllText(filename, results + "\n")
 
 [<EntryPoint>]
 /// <summary>
@@ -424,11 +430,13 @@ module IO =
 /// </summary>
 /// <param name="args">A list of command line arguments</param>
 let main argv = 
+    World.genes <- new SortedDictionary<int * int, List<DNA.Nucleotide>>()
+    World.homologousGenes <- new SortedDictionary<int * int, (int * int) list>()
     IO.readLines argv.[0] 
     |> Seq.toList
     |> List.map (fun str -> str.Split [|','|] |> Array.toList)
     |> List.iter (Events.events)
     World.genes |> Seq.iter (fun x -> World.homologousGenes.Add(x.Key, (Events.homologous x.Value)))
-    IO.writeResults "Results/test10.fa"
-    IO.writeHomologousResults "Results/test10.homolog"
+    IO.writeResults (argv.[0] + ".fa")
+    IO.writeHomologousResults (argv.[0] + ".homologs")
     0 // return an integer exit code

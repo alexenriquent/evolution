@@ -6,147 +6,88 @@ using System.Threading.Tasks;
 
 namespace Evolution3 {
 
-    /// <summary>
-    /// The World class contains a set of genes and
-    /// several types of events that alter existing 
-    /// genes in various ways.
-    /// </summary>
+    // The World class contains a set of genes and
+    // several types of events that alter existing 
+    // genes in various ways.
     public static class World {
         
-        /// <summary>
-        /// A list containing genes.
-        /// </summary>
+        // A list containing genes.
         public static List<Gene> genes;
 
-        /// <summary>
-        /// A sorted dictionary containing the homologous gene tracking results.
-        /// </summary>
+        // A sorted dictionary containing the homologous gene tracking results.
         public static SortedDictionary<Tuple<int, int>, List<Tuple<int, int>>> homologousGenes;
 
-        /// <summary>
-        /// Creates a new gene and adds it to the gene list.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene">An integer representing a gene ID</param>
-        /// <param name="dna">A string representing a sequence of DNA</param>
-        private static void Create(int species, int gene, string dna) {
-            genes.Add(new Gene(species, gene, 
-                      new DNA("create", new Tuple<int, int>(species, gene), dna)));
+        // Creates a new gene and adds it to the gene list.
+        private static void Create(int speciesId, int geneId, string dna) {
+            genes.Add(new Gene(speciesId, geneId, 
+                      new DNA("create", new Tuple<int, int>(speciesId, geneId), dna)));
         }
 
-        /// <summary>
-        /// A single nucleotide polymorphism (SNP).
-        /// Replaces a single nucleobase (or nucleotide) within
-        /// an existing gene with a different nucleobase.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene">An integer representing a gene ID</param>
-        /// <param name="index">An integer representing the index of 
-        /// nucleobase to be replaced</param>
-        /// <param name="dna">A string representing a single nucleobase</param>
-        private static void Snip(int species, int gene, int index, string dna) {
-            int i = GeneIndex(species, gene);
+        // A single nucleotide polymorphism (SNP).
+        // Replaces a single nucleobase (or nucleotide) within
+        // an existing gene with a different nucleobase.
+        private static void Snip(int speciesId, int geneId, int index, string dna) {
+            int i = GeneIndex(speciesId, geneId);
             genes[i].Dna.Dna[index].Nucleobase = Nucleobase.ToDNA(dna)[0];
         }
 
-        /// <summary>
-        /// Inserts a new sequence of DNA to an existing gene.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene">An integer representing a gene ID</param>
-        /// <param name="index">An integer representing the index to be inserted</param>
-        /// <param name="dna">A string representing a sequence of DNA</param>
-        private static void Insert(int species, int gene, int index, string dna) {
-            int i = GeneIndex(species, gene);
+        // Inserts a new sequence of DNA to an existing gene.
+        private static void Insert(int speciesId, int geneId, int index, string dna) {
+            int i = GeneIndex(speciesId, geneId);
             genes[i].Dna.Dna.InsertRange(index, 
-            DNA.ToNucleotides("insert", new Tuple<int, int>(species, gene), index, dna));
+            DNA.ToNucleotides("insert", new Tuple<int, int>(speciesId, geneId), index, dna));
         }
 
-        /// <summary>
-        /// Deletes a section of DNA from an existing gene.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene">An integer representing a gene ID</param>
-        /// <param name="index">An index to start the delete operation</param>
-        /// <param name="length">Length of the section to be deleted</param>
-        private static void Delete(int species, int gene, int index, int length) {
-            int i = GeneIndex(species, gene);
+        // Deletes a section of DNA from an existing gene.
+        private static void Delete(int speciesId, int geneId, int index, int length) {
+            int i = GeneIndex(speciesId, geneId);
             genes[i].Dna.Dna.RemoveRange(index, length);
         }
 
-        /// <summary>
-        /// Adds a new gene to an existing species that is an exact
-        /// copy of another gene within the same species.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene1">An integer representing the gene to be added</param>
-        /// <param name="gene2">An integer representing the gene to be copied</param>
-        private static void Duplicate(int species, int gene1, int gene2) {
-            int i = GeneIndex(species, gene2);
-            Gene gene = new Gene(species, gene1, new DNA(genes[i].Dna.Dna));
+        // Adds a new gene to an existing species that is an exact
+        // copy of another gene within the same species.
+        private static void Duplicate(int speciesId, int geneId1, int geneId2) {
+            int i = GeneIndex(speciesId, geneId2);
+            Gene gene = new Gene(speciesId, geneId1, new DNA(genes[i].Dna.Dna));
             genes.Add(gene);
         }
 
-        /// <summary>
-        /// Removes an existing gene from an existing species.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene">An integer representing a gene ID</param>
-        private static void Loss(int species, int gene) {
-            int i = GeneIndex(species, gene);
+        // Removes an existing gene from an existing species.
+        private static void Loss(int speciesId, int geneId) {
+            int i = GeneIndex(speciesId, geneId);
             genes.RemoveAt(i);
         }
 
-        /// <summary>
-        /// Splits an existing gene into 2 genes.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene1">An integer representing the gene to be created</param>
-        /// <param name="gene2">An integer representing the gene to be split</param>
-        /// <param name="index">An integer representing the spliting index</param>
-        private static void Fission(int species, int gene1, int gene2, int index) {
-            int i = GeneIndex(species, gene2);
-            Gene gene = new Gene(species, gene1, 
+        // Splits an existing gene into 2 genes
+        private static void Fission(int speciesId, int geneId1, int geneId2, int index) {
+            int i = GeneIndex(speciesId, geneId2);
+            Gene gene = new Gene(speciesId, geneId1, 
                         new DNA(genes[i].Dna.Dna.GetRange
                         (index, genes[i].Dna.Dna.Count - index)));
             genes.Add(gene);
             genes[i].Dna.Dna.RemoveRange(index, genes[i].Dna.Dna.Count - index);
         }
 
-        /// <summary>
-        /// Fuses two existing genes to create a new gene.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene1">An integer representing the gene to be fused</param>
-        /// <param name="gene2">An integer representing the gene to be removed</param>
-        private static void Fusion(int species, int gene1, int gene2) {
-            int i1 = GeneIndex(species, gene1);
-            int i2 = GeneIndex(species, gene2);
+        // Fuses two existing genes to create a new gene
+        private static void Fusion(int speciesId, int geneId1, int geneId2) {
+            int i1 = GeneIndex(speciesId, geneId1);
+            int i2 = GeneIndex(speciesId, geneId2);
             genes[i1].Dna.Dna.AddRange(new List<Nucleotide>(genes[i2].Dna.Dna));
-            Loss(species, gene2);
+            Loss(speciesId, geneId2);
         }
 
-        /// <summary>
-        /// Creates a new species from an existing species.
-        /// </summary>
-        /// <param name="species1">An integer representing the new species
-        /// to be created</param>
-        /// <param name="species2">An integer representing the existing species 
-        /// to be copied</param>
-        private static void Speciation(int species1, int species2) {
-            List<Gene> species = genes.FindAll(x => x.SpeciesId == species2);
+        // Creates a new species from an existing species.
+        private static void Speciation(int speciesId1, int speciesId2) {
+            List<Gene> species = genes.FindAll(x => x.SpeciesId == speciesId2);
             if (species.Count > 0) {
                 foreach (Gene gene in species) {
-                    genes.Add(new Gene(species1, gene.GeneId, new DNA(gene.Dna.Dna)));
+                    genes.Add(new Gene(speciesId1, gene.GeneId, new DNA(gene.Dna.Dna)));
                 }
             }
         }
 
-        /// <summary>
-        /// Different types of events which alter existing genes
-        /// in various ways.
-        /// </summary>
-        /// <param name="action">An array containing events</param>
+        // Different types of events which alter existing genes
+        // in various ways.
         public static void Events(string[] action) {
             if (Valid(action)) {
                 switch (action[0]) {
@@ -163,13 +104,8 @@ namespace Evolution3 {
             }
         }
 
-        /// <summary>
-        /// Checks from the event if the specified gene exists 
-        /// in the gene list.
-        /// </summary>
-        /// <param name="action">A string array containing an event</param>
-        /// <returns>True if the specified gene exists in the gene list,
-        /// false otherwise</returns>
+        // Checks from the event if the specified gene exists 
+        // in the gene list.
         private static bool Valid(string[] action) {
             if (action[0] == "create" || action[0] == "speciation") {
                 return true;
@@ -183,9 +119,7 @@ namespace Evolution3 {
             }
         }
 
-        /// <summary>
-        /// Tracks homologous genes of each gene in the gene list.
-        /// </summary>
+        // Tracks homologous genes of each gene in the gene list.
         public static void Homologous() {
             foreach (Gene gene1 in genes) {
                 Tuple<int, int> key = new Tuple<int, int>(gene1.SpeciesId, gene1.GeneId);
@@ -199,12 +133,7 @@ namespace Evolution3 {
             }
         }
 
-        /// <summary>
-        /// Determines whether two genes are homologous.
-        /// </summary>
-        /// <param name="gene1">The gene object to be compared</param>
-        /// <param name="gene2">Another gene object to be compared</param>
-        /// <returns></returns>
+        // Determines whether two genes are homologous.
         private static bool GeneCommon(Gene gene1, Gene gene2) {
             foreach (Nucleotide nucleotide1 in gene1.Dna.Dna) {
                 foreach (Nucleotide nucleotide2 in gene2.Dna.Dna) {
@@ -218,42 +147,24 @@ namespace Evolution3 {
             return false;
         }
 
-        /// <summary>
-        /// Parses a string to an integer.
-        /// </summary>
-        /// <param name="str">A string input</param>
-        /// <returns>An integer</returns>
+        // Parses a string to an integer.
         private static int Int(string str) {
             return Int32.Parse(str);
         }
 
-        /// <summary>
-        /// Gets a gene index using a specified predicate 
-        /// from the gene list.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene">An integer representing agene ID</param>
-        /// <returns>The index of the specified gene</returns>
-        private static int GeneIndex(int species, int gene) {
-            return genes.FindIndex(x => x.SpeciesId == species && x.GeneId == gene);
+        // Gets a gene index using a specified predicate 
+        // from the gene list.
+        private static int GeneIndex(int speciesId, int geneId) {
+            return genes.FindIndex(x => x.SpeciesId == speciesId && x.GeneId == geneId);
         }
 
-        /// <summary>
-        /// Checks if a gene with a specified predicate
-        /// exists in the gene list.
-        /// </summary>
-        /// <param name="species">An integer representing a species ID</param>
-        /// <param name="gene">An integer representing a gene ID</param>
-        /// <returns>True if the specified gene exists in the gene list,
-        /// false otherwise</returns>
-        private static bool GeneExists(int species, int gene) {
-            return genes.Exists(x => x.SpeciesId == species && x.GeneId == gene);
+        // Checks if a gene with a specified predicate
+        // exists in the gene list.
+        private static bool GeneExists(int speciesId, int geneId) {
+            return genes.Exists(x => x.SpeciesId == speciesId && x.GeneId == geneId);
         }
 
-        /// <summary>
-        /// Sorts and formats the gene list.
-        /// </summary>
-        /// <returns>The formated gene list</returns>
+        // Sorts and formats the gene list.
         public static List<string> Genes() {
             List<Gene> sortedGenes = genes.OrderBy(x => x.SpeciesId).
                                         ThenBy(x => x.GeneId).ToList();
@@ -267,10 +178,7 @@ namespace Evolution3 {
             return geneList;
         }
 
-        /// <summary>
-        /// Sorts and formats the homologous gene dictionary.
-        /// </summary>
-        /// <returns></returns>
+        // Sorts and formats the homologous gene dictionary.
         public static List<string> HomologousGenes() {
             List<string> geneList = new List<string>();
             foreach (var gene in homologousGenes) {

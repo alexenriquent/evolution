@@ -6,24 +6,16 @@ using System.Threading.Tasks;
 
 namespace Evolution3 {
 
-    /// <summary>
-    /// A set of nucleobases, including A (Adenine),
-    /// C (Cytosine), G (Guanine) and T (Thymine).
-    /// A nucleobase is not just any character, it has
-    /// to be from a limited set.
-    /// </summary>
+    // A set of nucleobases, including A (Adenine),
+    // C (Cytosine), G (Guanine) and T (Thymine).
+    // A nucleobase is not just any character, it has
+    // to be from a limited set.
     public enum Nucleobases { A, C, G, T }
 
-    /// <summary>
-    /// This class contains the nucleobase-related operations.
-    /// </summary>
+    // This class contains the nucleobase-related operations.
     public static class Nucleobase {
 
-        /// <summary>
-        /// Converts the input string to a list of nucleobases.
-        /// </summary>
-        /// <param name="dna">A string containing nucleobases</param>
-        /// <returns>A list of nucleobases</returns>
+        // Converts the input string to a list of nucleobases
         public static List<Nucleobases> ToDNA(string dna) {
             List<Nucleobases> dnaList = new List<Nucleobases>();
             foreach (char nucleobase in dna) {

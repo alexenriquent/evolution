@@ -1,0 +1,63 @@
+HOMOLOGOUS GENE TRACKING
+
+Gene Records (First Approach)
+
+(1,1): [(create,(1,1),0,A),(create,(1,1),1,C),(create,(1,1),2,T),(create,(1,1),3,A),(create,(1,1),4,A),(create,(1,1),5,G),(create,(1,1),6,C),(create,(1,1),7,A),(create,(1,1),8,G),(create,(1,1),9,G),(create,(1,1),10,A),(create,(1,1),11,A),(create,(1,1),12,A),(create,(1,1),13,G),(create,(1,1),14,C)]  
+
+Gene Records (Second Approach)
+
+(1,1): (create,(1,1),(0,4),ACTAA), (insert,(1,1),(5,3), ACTG), (create,(1,1),(5,0),G), (create,(1,1),(6,8),CAGGAAAGC)
+(1,2): (create,(1,2),(0,9),TGAATACCGT), (create,(1,2),(10,0),A), (create,(1,2),(11,10),GATAAAACAGT)
+(1,3): (create,(1,2),(0,9),TGAATACCGT)
+(2,1): (create,(1,1),(0,4),ACTAA), (create,(1,1),(5,0),G), (insert,(1,1),(5,3), ACTG)
+(2,3): (create,(1,1),(6,8),CAGGAAAGC), (create,(1,2),(0,9),TGAATACCGT), (create,(1,2),(10,0),A), (create,(1,2),(11,10),GATAAAACAGT)
+(2,4): (create,(1,2),(11,10),GATAAAACAGT)
+
+Gene Comparison
+
+(1,1): (1,1)
+
+(1,1): (1,1)
+(1,2): (1,2)
+
+(1,1): (1,1)
+(1,2): (1,2), (1,3)
+(1,3): (1,2), (1,3)
+
+(1,1): (1,1), (2,1)
+(1,2): (1,2), (1,3)
+(1,3): (1,2), (1,3)
+(2,1): (1,1), (2,1)
+
+(1,1): (1,1), (2,1), (2,3)
+(1,2): (1,2), (1,3), (2,3)
+(1,3): (1,2), (1,3), (2,3)
+(2,1): (1,1), (2,1)
+(2,3): (1,1), (1,2), (1,3), (2,3)
+
+(1,1): (1,1), (2,1), (2,3)
+(1,2): (1,2), (1,3), (2,3), (2,4)
+(1,3): (1,2), (1,3), (2,3)
+(2,1): (1,1), (2,1)
+(2,3): (1,1), (1,2), (1,3), (2,3), (2,4)
+(2,4): (1,2), (2,3), (2,4)
+
+Homolog
+
+SE1_G1: SE1_G1 SE2_G1 SE2_G3
+SE1_G2: SE1_G2 SE1_G3 SE2_G3 SE2_G4
+SE1_G3: SE1_G2 SE1_G3 SE2_G3
+SE2_G1: SE1_G1 SE2_G1
+SE2_G3: SE1_G1 SE1_G2 SE1_G3 SE2_G3 SE2_G4
+SE2_G4: SE1_G2 SE2_G3 SE2_G4
+
+Reference (Wayne Kelly)
+
+Let me first discuss tracking origins without regard for trying to be efficient (which is fine for this assignment). For each nucleotide in each gene we could keep track of it's origin, where origin consists of which create or insert event it came from originally and the position of that nucleotide within that original sequence. It is not sufficient to know just the create or insert event as genes are only homologous if they contain subsequences that came from the same section of some creation/insertion event.
+
+If you care about efficiency, then rather than storing the origin of every nucleotide separately, you could instead represent each gene as a sequence of substrings, each of which has an origin. In this case the origin of a substring would be the create/insert event plus the specific range of positions that it came from.
+For example, for a gene of length 45, if may be that the first 10 nucleotides came originally from position 10-19 of some create event, the next 20 nucleotides came originally from position 0-19 of some insert event and the last 15 nucleotides came from positions 20-34 of the same creation event.
+
+So, an origin consists of an event plus a position or range of positions. Positions are just integers, but how do we store events so that we can easily compare 2 events for equality? There are many solutions to this problem, we don't need to remember anything about these events, we just need to be able to compare two origins and decide if they came from the same event. We could give each event a unique integer id, but generating unique ids requires either state or an inefficient algorithm. For convenience, my sample solution allocates a new object to represent each event (literally new object()). I don't actually store anything in these objects, I just use them for their object identity.
+
+Again, many other solutions are possible.

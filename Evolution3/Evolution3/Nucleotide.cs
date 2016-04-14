@@ -6,35 +6,19 @@ using System.Threading.Tasks;
 
 namespace Evolution3 {
 
-    /// <summary>
-    /// This class contains the Nucleotide properties and operations.
-    /// </summary>
+    // This class contains the Nucleotide properties and operations
     public class Nucleotide {
 
-        /// <summary>
-        /// The event associated with this nucleotide object.
-        /// </summary>
+        // The event associated with this nucleotide object
         private string action;
-        /// <summary>
-        /// The origin of this nucleotide object.
-        /// </summary>
+        // The origin of this nucleotide object.
         private Tuple<int, int> origin;
-        /// <summary>
-        /// The position of this nucleotide object.
-        /// </summary>
+        // The position of this nucleotide object.
         private int position;
-        /// <summary>
-        /// The nucleobase associated with this nucleotide object.
-        /// </summary>
+        // The nucleobase associated with this nucleotide object.
         private Nucleobases nucleobase;
 
-        /// <summary>
-        /// The Nucleotide class constructor
-        /// </summary>
-        /// <param name="action">A string representing an event</param>
-        /// <param name="origin">A tuple representing a gene origin</param>
-        /// <param name="position">An integer representing a gene position</param>
-        /// <param name="nucleobase">A nucleobase</param>
+        // The Nucleotide class constructor
         public Nucleotide(string action, Tuple<int, int> origin, int position, Nucleobases nucleobase) {
             this.action = action;
             this.origin = origin;
@@ -42,33 +26,25 @@ namespace Evolution3 {
             this.nucleobase = nucleobase;
         }
 
-        /// <summary>
-        /// Accessor and mutator for this nucleotide's event
-        /// </summary>
+        // Accessor and mutator for this nucleotide's event
         public string Action {
             get { return this.action; }
             set { this.action = value; }
         }
 
-        /// <summary>
-        /// Accessor and mutator for this nucleotide's origin
-        /// </summary>
+        // Accessor and mutator for this nucleotide's origin
         public Tuple<int,int> Origin {
             get { return this.origin; }
             set { this.origin = value; }
         }
 
-        /// <summary>
-        /// Accessor and mutator for this nucleotide's position
-        /// </summary>
+        // Accessor and mutator for this nucleotide's position
         public int Position {
             get { return this.position; }
             set { this.position = value; }
         }
 
-        /// <summary>
-        /// Accessor and mutator for this nucleotide's nucleobase
-        /// </summary>
+        // Accessor and mutator for this nucleotide's nucleobase
         public Nucleobases Nucleobase {
             get { return this.nucleobase; }
             set { this.nucleobase = value; }

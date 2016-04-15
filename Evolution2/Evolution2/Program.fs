@@ -113,7 +113,7 @@ module DNA =
         |> List.rev   
     
     // Determines if two sequences of nucleotides contain common elements. 
-    let findCommon (nucleotides1: List<Nucleotide>) (nucleotides2: List<Nucleotide>) =
+    let findCommon nucleotides1 nucleotides2 =
         let dna1 = Seq.fold (fun acc x -> (x.event, x.origin, x.position) :: acc) [] nucleotides1
         let dna2 = Seq.fold (fun acc x -> (x.event, x.origin, x.position) :: acc) [] nucleotides2
         match dna1.Intersect(dna2).Any() with
@@ -148,7 +148,8 @@ module Events =
     
     // Creates a new gene and adds it to the gene list.
     let create speciesId geneId dna =
-        genes.Add((speciesId, geneId), toNucleotides "create" (speciesId, geneId) 0 (toDNA dna))
+        let nucleotides = toNucleotides "create" (speciesId, geneId) 0 (toDNA dna)
+        genes.Add((speciesId, geneId), nucleotides)
     
     // A single nucleotide polymorphism (SNP).
     // Replaces a single nucleobase (or nucleotide) within
@@ -158,7 +159,8 @@ module Events =
     
     // Inserts a new sequence of DNA to an existing gene.
     let insert speciesId geneId index dna =
-        genes.[(speciesId, geneId)].InsertRange(index, (toNucleotides "insert" (speciesId, geneId) index (toDNA dna)))  
+        let nucleotides = toNucleotides "insert" (speciesId, geneId) index (toDNA dna)
+        genes.[(speciesId, geneId)].InsertRange(index, nucleotides)  
     
     // Deletes a section of DNA from an existing gene.
     let delete speciesId geneId index length =
@@ -198,7 +200,7 @@ module Events =
     // Checks from the event if the specified gene exists 
     // in the gene dictionary.
     let valid event =
-        let exists species gene = genes.ContainsKey((species, gene))
+        let exists speciesId geneId = genes.ContainsKey((speciesId, geneId))
         match event |> List.head with
         | "create" | "speciation" -> true
         | "duplicate" | "fission" -> exists (Int event.[1]) (Int event.[3])
@@ -208,7 +210,7 @@ module Events =
 
     // Different types of events which alter existing genes
     // in various ways.
-    let events (event: string list) =
+    let events event =
         match valid event with
         | false -> ()
         | true ->

@@ -91,9 +91,9 @@ module DNA =
         |> toString
 
     // Determines if two sequences of nucleotides contain common elements
-    let findCommon (nucleotides1: List<Nucleotide>) (nucleotides2: List<Nucleotide>) =
-        let dna1 = Seq.fold (fun acc x -> (x.event, x.origin, x.position) :: acc) [] nucleotides1
-        let dna2 = Seq.fold (fun acc x -> (x.event, x.origin, x.position) :: acc) [] nucleotides2
+    let findCommon nucleotides1 nucleotides2 =
+        let dna1 = List.fold (fun acc x -> (x.event, x.origin, x.position) :: acc) [] nucleotides1
+        let dna2 = List.fold (fun acc x -> (x.event, x.origin, x.position) :: acc) [] nucleotides2
         match dna1.Intersect(dna2).Any() with
         | true -> true
         | false -> false
@@ -144,7 +144,8 @@ module Events =
     
     // Creates a new gene and returns a new map containing that gene.   
     let create genes speciesId geneId dna =
-        Map.add (speciesId, geneId) (toNucleotides "create" (speciesId, geneId) 0 (toDNA dna)) genes
+        let nucleotides = toNucleotides "create" (speciesId, geneId) 0 (toDNA dna)
+        genes |> Map.add (speciesId, geneId) nucleotides
      
     // A single nucleotide polymorphism (SNP).
     // Replaces a single nucleobase (or nucleotide) within
